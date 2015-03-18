@@ -62,7 +62,12 @@
 	      (ask-question)
 	      (setf answer (read-line))))))))
 
-(defun prompt (&optional msg &rest args)
+(defun prompt (&optional msg &key default)
   (when msg
-    (apply #'msg* msg args))
-  (read-line))
+    (msg* msg))
+  (when default
+    (format t "[~A] " default))
+  (let ((input (read-line)))
+    (if (and (string-equal input "") default)
+	default
+	input)))
