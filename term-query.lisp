@@ -61,3 +61,8 @@
 		  (msg "Answer yes or no"))
 	      (ask-question)
 	      (setf answer (read-line))))))))
+
+(defun prompt (&optional msg &rest args)
+  (when msg
+    (apply #'msg* msg args))
+  (read-line))

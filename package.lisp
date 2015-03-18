@@ -4,5 +4,6 @@
 	   :msg
 	   :msg*
 	   :choose
-	   :choose-many))
+	   :choose-many
+	   :prompt))
 
