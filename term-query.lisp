@@ -71,15 +71,19 @@
 	      (ask-question)
 	      (setf answer (read-line))))))))
 
-(defun prompt (&optional msg &key default)
-  (when msg
-    (msg* msg))
-  (when default
-    (format t "[~A] " default))
-  (let ((input (read-line)))
-    (if (and (string-equal input "") default)
-	default
-	input)))
+(defun prompt (&optional msg &key default (required-p t))
+  (loop do
+       (when msg
+	 (msg* msg))
+       (when default
+	 (msg* "[~A] " default))
+       (let ((input (read-line)))
+	 (cond ((and (string-equal input "") default)
+		(return default))
+	       ((and (string-equal input "") required-p)
+		(msg "A non empty value is required"))
+	       (t
+		(return input))))))
 
 (defun prompt-integer (&optional msg &key default if-wrong-input)
   (flet ((render-input ()
