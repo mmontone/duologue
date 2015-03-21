@@ -165,7 +165,8 @@
 
 (defun parse-prompt (parser &optional msg &key default 
 					    (required-p t) 
-					    if-wrong-input
+					    validator
+					    if-invalid
 					    (color *prompt-color*)
 					    (error-color *prompt-error-color*))
   (loop do
@@ -182,34 +183,39 @@
 	       ((and (string-equal input "") (not required-p))
 		(return nil))
 	       ((not parsed-input)
-		(if if-wrong-input
-		    (funcall if-wrong-input)
+		(if if-invalid
+		    (funcall if-invalid)
+		    (msg "Invalid value" :color error-color)))
+	       ((and validator
+		     (not (funcall validator parsed-input)))
+		(if if-invalid
+		    (funcall if-invalid)
 		    (msg "Invalid value" :color error-color)))
 	       (parsed-input
 		(return parsed-input))))))	       
 
 (defun prompt-integer (&optional msg &key default 
 				       (required-p t) 
-				       if-wrong-input
+				       if-invalid
 				       (color *prompt-color*)
 				       (error-color *prompt-error-color*))
   (parse-prompt #'parse-integer msg 
 		:default default
 		:required-p required-p
-		:if-wrong-input (or if-wrong-input 
-				    (lambda () (msg "Error: Not a number" :color error-color)))
+		:if-invalid (or if-invalid 
+				(lambda () (msg "Error: Not a number" :color error-color)))
 		:color color
 		:error-color error-color))
 
 (defun prompt-email (&optional msg &key default 
 				     (required-p t) 
-				     if-wrong-input
+				     if-invalid
 				     (color *prompt-color*)
 				     (error-color *prompt-error-color*))
   (prompt msg :default default
 	  :required-p required-p
 	  :validator (clavier:valid-email)
-	  :if-invalid (or if-wrong-input
+	  :if-invalid (or if-invalid
 			  (lambda (&optional value)
 			    (msg "Invalid email" :color error-color)))
 	  :color color
@@ -217,7 +223,7 @@
 
 (defun prompt-url (&optional msg &key default 
 				   (required-p t) 
-				   if-wrong-input
+				   if-invalid
 				   (color *prompt-color*)
 				   (error-color *prompt-error-color*)
 				   probe
@@ -227,7 +233,7 @@
 	   (return-from prompt-url
 	     (prompt-url msg :default default
 			 :required-p required-p
-			 :if-wrong-input if-wrong-input
+			 :if-invalid if-invalid
 			 :color color
 			 :error-color error-color
 			 :probe probe
@@ -237,7 +243,7 @@
 	   (prompt msg :default default
 		   :required-p required-p
 		   :validator (clavier:valid-url)
-		   :if-invalid (or if-wrong-input
+		   :if-invalid (or if-invalid
 				   (lambda (&optional value)
 				     (msg "Invalid url" :color error-color)))
 		   :color color
@@ -264,17 +270,73 @@
 		 (recurse))))))
 	url)))
 
+(defun prompt-pathname (&optional msg &key default 
+					(required-p t) 
+					if-invalid
+					(color *prompt-color*)
+					(error-color *prompt-error-color*)
+					probe
+					if-exists
+					(if-does-not-exist :error)
+					absolute-p
+					file-type
+					directory-p)
+  (flet ((recurse ()
+	   (return-from prompt-pathname
+	     (prompt-pathname msg :default default
+			      :required-p required-p
+			      :if-invalid if-invalid
+			      :color color
+			      :error-color error-color
+			      :probe probe
+			      :if-exists if-exists
+			      :if-does-not-exist if-does-not-exist
+			      :absolute-p absolute-p
+			      :file-type file-type))))
+    (let ((pathname
+	   (parse-prompt #'pathname
+			 msg 
+			 :default default
+			 :required-p required-p
+			 :validator (make-instance 'clavier:pathname-validator
+						   :absolute-p absolute-p
+						   :pathname-type file-type)
+			 :if-invalid (or if-invalid
+					 (lambda (&optional value)
+					   (msg "Invalid url" :color error-color)))
+			 :color color
+			 :error-color error-color)))
+      (when probe
+	(if (probe-file pathname)
+	    (when if-exists
+	      (funcall if-exists))
+	    ;; else
+	    (ecase if-does-not-exist
+	      (:error 
+	       (msg "The pathname does not exist." :color error-color)
+	       (recurse))
+	      (:warn
+	       (msg "The pathname does not exist." :color error-color)
+	       (when (not (ask "Continue?:" :default nil))
+		 (recurse)))
+	      (:warn-and-continue
+	       (msg "The pathname does not exist." :color error-color))
+	      (:warn-and-ask-again
+	       (msg "The pathname does not exist." :color error-color)
+	       (recurse)))))
+      pathname)))
+
 (defun prompt-datetime (&optional msg &key default 
 					(required-p t) 
-					if-wrong-input
+					if-invalid
 					(color *prompt-color*)
 					(error-color *prompt-error-color*))
   (parse-prompt #'chronicity:parse msg
 		:default default
 		:required-p required-p
-		:if-wrong-input (or if-wrong-input
-				    (lambda () (msg "Error. Invalid timestamp"
-						    :color error-color)))
+		:if-invalid (or if-invalid
+				(lambda () (msg "Error. Invalid timestamp"
+						:color error-color)))
 		:color color
 		:error-color error-color))
 
