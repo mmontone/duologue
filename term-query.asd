@@ -4,5 +4,6 @@
   :license "MIT"
   :serial t
   :components ((:file "package")
-               (:file "term-query")))
+               (:file "term-query"))
+  :depends-on (:anaphora :clavier))
 

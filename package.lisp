@@ -7,5 +7,6 @@
 	   :choose-many
 	   :prompt
 	   :prompt-integer
+	   :prompt-email
 	   :parse-prompt))
 

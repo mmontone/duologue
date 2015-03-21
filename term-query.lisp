@@ -71,7 +71,7 @@
 	      (ask-question)
 	      (setf answer (read-line))))))))
 
-(defun prompt (&optional msg &key default (required-p t))
+(defun prompt (&optional msg &key default (required-p t) validator if-invalid)
   (loop do
        (when msg
 	 (msg* msg))
@@ -82,6 +82,11 @@
 		(return default))
 	       ((and (string-equal input "") required-p)
 		(msg "A non empty value is required"))
+	       ((and validator
+		     (not (funcall validator input)))
+		(if if-invalid
+		    (funcall if-invalid input)
+		    (msg "The value is not valid")))
 	       (t
 		(return input))))))
 
@@ -112,6 +117,14 @@
 		:required-p required-p
 		:if-wrong-input (or if-wrong-input 
 				    (lambda () (msg "Error: Not a number")))))	
+
+(defun prompt-email (&optional msg &key default (required-p t) if-wrong-input)
+  (prompt msg :default default
+	  :required-p required-p
+	  :validator (clavier:valid-email)
+	  :if-invalid (or if-wrong-input
+			  (lambda (&optional value)
+			    (msg "Invalid email")))))
 
 (defun choose-many (msg options &key if-wrong-option default (separator "~%") (test #'eql))
   (let ((chosen-options nil))
