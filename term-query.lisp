@@ -21,17 +21,20 @@
 	   (when default
 	     (msg* "[~A] " default))))
     (render-options)
-    (let ((chosen-option (ignore-errors (parse-integer (read-line)))))
+    (let* ((chosen-option (read-line))
+	   (option-number (ignore-errors (parse-integer chosen-option))))
       (loop 
 	 do 
-	   (cond ((and (null chosen-option)
+	   (cond ((and (equalp chosen-option "")
 		       default)
-		  (return-from choose default))
-		 ((and chosen-option
-		       (>= chosen-option 0)
-		       (< chosen-option (length options)))
+		  (return default))
+		 ((find chosen-option (mapcar #'princ-to-string options) :test #'string=)
+		  (return (find chosen-option (mapcar #'princ-to-string options) :test #'string=)))
+		 ((and option-number
+		       (>= option-number 0)
+		       (< option-number (length options)))
 		  ;; Correct option
-		  (return))
+		  (return (nth option-number options)))
 		 (t
 		  ;; Incorrect option
 		  (progn
@@ -39,8 +42,8 @@
 			(funcall if-wrong-option)
 			(msg "Wrong option."))
 		    (render-options))))
-	   (setf chosen-option (ignore-errors (parse-integer (read-line)))))
-      (values (nth chosen-option options) chosen-option))))
+	   (setf chosen-option (read-line))
+	   (setf option-number (ignore-errors (parse-integer chosen-option)))))))
 
 (defun ask (&optional (msg "Yes or no: ") &key (default nil default-p) if-wrong-answer)
   (check-type default boolean)
