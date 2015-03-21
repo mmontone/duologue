@@ -126,6 +126,14 @@
 			  (lambda (&optional value)
 			    (msg "Invalid email")))))
 
+(defun prompt-url (&optional msg &key default (required-p t) if-wrong-input)
+  (prompt msg :default default
+	  :required-p required-p
+	  :validator (clavier:valid-url)
+	  :if-invalid (or if-wrong-input
+			  (lambda (&optional value)
+			    (msg "Invalid url")))))
+
 (defun choose-many (msg options &key if-wrong-option default (separator "~%") (test #'eql))
   (let ((chosen-options nil))
     (flet ((render-options ()

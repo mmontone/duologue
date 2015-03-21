@@ -8,5 +8,6 @@
 	   :prompt
 	   :prompt-integer
 	   :prompt-email
+	   :prompt-url
 	   :parse-prompt))
 
