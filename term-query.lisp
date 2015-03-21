@@ -31,10 +31,11 @@
       (select-completions options))))
   
 (defun choose (msg options &key if-wrong-option 
-			     default 
+			     default
+			     (print-options t)
 			     (separator "~%")
 			     complete)
-  (flet ((render-options ()
+  (flet ((print-options ()
 	   (loop 
 	      for option in options
 	      for i from 0 
@@ -52,7 +53,8 @@
 		 (rl:register-function :complete (make-completer options))
 		 (rl:readline :prompt (format nil "~A~@[[~A]~]" msg default)))
 	       (read-line))))
-    (render-options)
+    (when print-options
+      (print-options))
     (let* ((chosen-option (read-option))
 	   (option-number (ignore-errors (parse-integer chosen-option))))
       (loop 
@@ -73,7 +75,8 @@
 		    (if if-wrong-option
 			(funcall if-wrong-option)
 			(msg "Wrong option."))
-		    (render-options))))
+		    (when print-options
+		      (print-options)))))
 	   (setf chosen-option (read-option))
 	   (setf option-number (ignore-errors (parse-integer chosen-option)))))))
   
@@ -175,7 +178,7 @@
 
 (defun choose-many (msg options &key if-wrong-option default (separator "~%") (test #'eql))
   (let ((chosen-options nil))
-    (flet ((render-options ()
+    (flet ((print-options ()
 	     (loop 
 		for option in options
 		for i from 0 
@@ -188,7 +191,7 @@
 	     (msg* msg)
 	     (when default
 	       (msg* "[~A] " default))))
-      (render-options)
+      (print-options)
       (let* ((chosen-option (read-line))
 	     (option-number (ignore-errors (parse-integer chosen-option))))
 	(loop 
@@ -199,19 +202,19 @@
 			(return (reverse chosen-options))))
 		   ((find chosen-option (mapcar #'princ-to-string options) :test #'string=)
 		    (pushnew (find chosen-option (mapcar #'princ-to-string options) :test #'string=) chosen-options :test test)
-		    (render-options))
+		    (print-options))
 		   ((and option-number
 			 (>= option-number 0)
 			 (< option-number (length options)))
 		    ;; Correct option
 		    (pushnew (nth option-number options) chosen-options :test test)
-		    (render-options))
+		    (print-options))
 		   (t
 		    ;; Incorrect option
 		    (progn
 		      (if if-wrong-option
 			  (funcall if-wrong-option)
 			  (msg "Wrong option."))
-		      (render-options))))
+		      (print-options))))
 	     (setf chosen-option (read-line))
 	     (setf option-number (ignore-errors (parse-integer chosen-option))))))))
