@@ -9,5 +9,5 @@
 	   :prompt-integer
 	   :prompt-email
 	   :prompt-url
+	   :prompt-datetime
 	   :parse-prompt))
-

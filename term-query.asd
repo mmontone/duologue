@@ -5,5 +5,5 @@
   :serial t
   :components ((:file "package")
                (:file "term-query"))
-  :depends-on (:anaphora :clavier))
+  :depends-on (:anaphora :clavier :chronicity))
 

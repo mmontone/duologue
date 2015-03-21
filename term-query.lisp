@@ -134,6 +134,13 @@
 			  (lambda (&optional value)
 			    (msg "Invalid url")))))
 
+(defun prompt-datetime (&optional msg &key default (required-p t) if-wrong-input)
+  (parse-prompt #'chronicity:parse msg
+		:default default
+		:required-p required-p
+		:if-wrong-input (or if-wrong-input
+				    (lambda () (msg "Error. Invalid timestamp")))))
+
 (defun choose-many (msg options &key if-wrong-option default (separator "~%") (test #'eql))
   (let ((chosen-options nil))
     (flet ((render-options ()
