@@ -176,7 +176,12 @@
 		:if-wrong-input (or if-wrong-input
 				    (lambda () (msg "Error. Invalid timestamp")))))
 
-(defun choose-many (msg options &key if-wrong-option default (separator "~%") (test #'eql))
+(defun choose-many (msg options &key if-wrong-option 
+				  default 
+				  (print-options t)
+				  (separator "~%")
+				  complete
+				  (test #'eql))
   (let ((chosen-options nil))
     (flet ((print-options ()
 	     (loop 
@@ -190,9 +195,16 @@
 	     (msg "Chosen options: ~{~A~^, ~}" (reverse chosen-options))
 	     (msg* msg)
 	     (when default
-	       (msg* "[~A] " default))))
-      (print-options)
-      (let* ((chosen-option (read-line))
+	       (msg* "[~A] " default)))
+	   (read-option ()
+	     (if complete
+		 (progn
+		   (rl:register-function :complete (make-completer options))
+		   (rl:readline :prompt (format nil "~A~@[[~A]~]" msg default)))
+		 (read-line))))
+      (when print-options
+	(print-options))
+      (let* ((chosen-option (read-option))
 	     (option-number (ignore-errors (parse-integer chosen-option))))
 	(loop 
 	   do 
@@ -202,19 +214,22 @@
 			(return (reverse chosen-options))))
 		   ((find chosen-option (mapcar #'princ-to-string options) :test #'string=)
 		    (pushnew (find chosen-option (mapcar #'princ-to-string options) :test #'string=) chosen-options :test test)
-		    (print-options))
+		    (when print-options
+		      (print-options)))
 		   ((and option-number
 			 (>= option-number 0)
 			 (< option-number (length options)))
 		    ;; Correct option
 		    (pushnew (nth option-number options) chosen-options :test test)
-		    (print-options))
+		    (when print-options
+		      (print-options)))
 		   (t
 		    ;; Incorrect option
 		    (progn
 		      (if if-wrong-option
 			  (funcall if-wrong-option)
 			  (msg "Wrong option."))
-		      (print-options))))
-	     (setf chosen-option (read-line))
+		      (when print-options
+			(print-options)))))
+	     (setf chosen-option (read-option))
 	     (setf option-number (ignore-errors (parse-integer chosen-option))))))))
