@@ -1,5 +1,5 @@
 (defpackage #:term-query
-  (:use #:cl)
+  (:use #:cl #:anaphora)
   (:export :ask
 	   :msg
 	   :msg*

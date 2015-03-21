@@ -9,4 +9,5 @@
 	       :alexandria
 	       :clavier 
 	       :chronicity
-	       :cl-readline))
+	       :cl-readline
+	       :cl-ansi-text))
