@@ -7,7 +7,7 @@
 (defun msg* (msg &rest args)
   (apply #'format t (cons msg args)))  
 
-(defun choose (msg options &key if-wrong-option (separator "~%"))
+(defun choose (msg options &key if-wrong-option default (separator "~%"))
   (flet ((render-options ()
 	   (loop 
 	      for option in options
@@ -17,22 +17,28 @@
 		(when (< (1+ i) (length options))
 		  (format t separator)))
 	   (terpri)
-	   (msg* msg)))
+	   (msg* msg)
+	   (when default
+	     (msg* "[~A] " default))))
     (render-options)
     (let ((chosen-option (ignore-errors (parse-integer (read-line)))))
       (loop 
 	 do 
-	   (if (and chosen-option
-		    (>= chosen-option 0)
-		    (< chosen-option (length options)))
-	       ;; Correct option
-	       (return)
-	       ;; Incorrect option
-	       (progn
-		 (if if-wrong-option
-		     (funcall if-wrong-option)
-		     (msg "Wrong option."))
-		 (render-options)))
+	   (cond ((and (null chosen-option)
+		       default)
+		  (return-from choose default))
+		 ((and chosen-option
+		       (>= chosen-option 0)
+		       (< chosen-option (length options)))
+		  ;; Correct option
+		  (return))
+		 (t
+		  ;; Incorrect option
+		  (progn
+		    (if if-wrong-option
+			(funcall if-wrong-option)
+			(msg "Wrong option."))
+		    (render-options))))
 	   (setf chosen-option (ignore-errors (parse-integer (read-line)))))
       (values (nth chosen-option options) chosen-option))))
 
