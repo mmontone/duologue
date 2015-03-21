@@ -5,9 +5,35 @@
   (terpri t))
 
 (defun msg* (msg &rest args)
-  (apply #'format t (cons msg args)))  
+  (apply #'format t (cons msg args)))
 
-(defun choose (msg options &key if-wrong-option default (separator "~%"))
+(defun make-completer (options)
+  (lambda (text start end)
+    (declare (ignorable start end))
+    (labels ((common-prefix (items)
+             (subseq
+              (car items) 0
+              (position
+               nil
+               (mapcar
+                (lambda (i)
+                  (every (lambda (x)
+                           (char= (char (car items) i)
+                                  (char x           i)))
+                         (cdr items)))
+                (alexandria:iota (reduce #'min (mapcar #'length items)))))))
+           (select-completions (list)
+             (let ((els (remove-if-not (alexandria:curry #'alexandria:starts-with-subseq text)
+                                       list)))
+               (if (cdr els)
+                   (cons (common-prefix els) els)
+                   els))))
+      (select-completions options))))
+  
+(defun choose (msg options &key if-wrong-option 
+			     default 
+			     (separator "~%")
+			     complete)
   (flet ((render-options ()
 	   (loop 
 	      for option in options
@@ -19,9 +45,15 @@
 	   (terpri)
 	   (msg* msg)
 	   (when default
-	     (msg* "[~A] " default))))
+	     (msg* "[~A] " default)))
+	 (read-option ()
+	   (if complete
+	       (progn
+		 (rl:register-function :complete (make-completer options))
+		 (rl:readline :prompt (format nil "~A~@[[~A]~]" msg default)))
+	       (read-line))))
     (render-options)
-    (let* ((chosen-option (read-line))
+    (let* ((chosen-option (read-option))
 	   (option-number (ignore-errors (parse-integer chosen-option))))
       (loop 
 	 do 
@@ -42,9 +74,9 @@
 			(funcall if-wrong-option)
 			(msg "Wrong option."))
 		    (render-options))))
-	   (setf chosen-option (read-line))
+	   (setf chosen-option (read-option))
 	   (setf option-number (ignore-errors (parse-integer chosen-option)))))))
-
+  
 (defun ask (&optional (msg "Yes or no: ") &key (default nil default-p) if-wrong-answer)
   (check-type default boolean)
   (labels ((format-boolean (boolean)
