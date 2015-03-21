@@ -5,5 +5,6 @@
 	   :msg*
 	   :choose
 	   :choose-many
-	   :prompt))
+	   :prompt
+	   :prompt-integer))
 

@@ -80,3 +80,23 @@
     (if (and (string-equal input "") default)
 	default
 	input)))
+
+(defun prompt-integer (&optional msg &key default if-wrong-input)
+  (flet ((render-input ()
+	   (when msg
+	     (msg* msg))
+	   (when default
+	     (format t "[~A] " default))))
+    (loop do
+	 (render-input)
+	 (let* ((input (read-line))
+		(number (ignore-errors (parse-integer input))))
+	   (cond 
+	     ((and (string-equal input "") default)
+	      (return default))
+	     ((not number)
+	      (if if-wrong-input
+		  (funcall if-wrong-input)
+		  (msg "Error: Not a number")))
+	     (number
+	      (return number)))))))
