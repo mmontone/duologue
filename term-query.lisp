@@ -85,25 +85,33 @@
 	       (t
 		(return input))))))
 
-(defun prompt-integer (&optional msg &key default if-wrong-input)
-  (flet ((render-input ()
-	   (when msg
-	     (msg* msg))
-	   (when default
-	     (format t "[~A] " default))))
-    (loop do
-	 (render-input)
-	 (let* ((input (read-line))
-		(number (ignore-errors (parse-integer input))))
-	   (cond 
-	     ((and (string-equal input "") default)
-	      (return default))
-	     ((not number)
-	      (if if-wrong-input
-		  (funcall if-wrong-input)
-		  (msg "Error: Not a number")))
-	     (number
-	      (return number)))))))
+(defun parse-prompt (parser &optional msg &key default (required-p t) if-wrong-input)
+  (loop do
+       (when msg
+	 (msg* msg))
+       (when default
+	 (msg* "[~A] " default))
+       (let* ((input (read-line))
+	      (parsed-input (ignore-errors (funcall parser input))))
+	 (cond ((and (string-equal input "") default)
+		(return default))
+	       ((and (string-equal input "") required-p)
+		(msg "A non empty value is required"))
+	       ((and (string-equal input "") (not required-p))
+		(return nil))
+	       ((not parsed-input)
+		(if if-wrong-input
+		    (funcall if-wrong-input)
+		    (msg "Invalid value")))
+	       (parsed-input
+		(return parsed-input))))))	       
+
+(defun prompt-integer (&optional msg &key default (required-p t) if-wrong-input)
+  (parse-prompt #'parse-integer msg 
+		:default default
+		:required-p required-p
+		:if-wrong-input (or if-wrong-input 
+				    (lambda () (msg "Error: Not a number")))))	
 
 (defun choose-many (msg options &key if-wrong-option default (separator "~%") (test #'eql))
   (let ((chosen-options nil))

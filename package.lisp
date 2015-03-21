@@ -6,5 +6,6 @@
 	   :choose
 	   :choose-many
 	   :prompt
-	   :prompt-integer))
+	   :prompt-integer
+	   :parse-prompt))
 
