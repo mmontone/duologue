@@ -10,4 +10,6 @@
 	       :clavier 
 	       :chronicity
 	       :cl-readline
-	       :cl-ansi-text))
+	       :cl-ansi-text
+	       :drakma
+	       :cl-fad))

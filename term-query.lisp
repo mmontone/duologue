@@ -219,15 +219,50 @@
 				   (required-p t) 
 				   if-wrong-input
 				   (color *prompt-color*)
-				   (error-color *prompt-error-color*))
-  (prompt msg :default default
-	  :required-p required-p
-	  :validator (clavier:valid-url)
-	  :if-invalid (or if-wrong-input
-			  (lambda (&optional value)
-			    (msg "Invalid url" :color error-color)))
-	  :color color
-	  :error-color error-color))
+				   (error-color *prompt-error-color*)
+				   probe
+				   if-exists
+				   (if-does-not-exist :error))
+  (flet ((recurse ()
+	   (return-from prompt-url
+	     (prompt-url msg :default default
+			 :required-p required-p
+			 :if-wrong-input if-wrong-input
+			 :color color
+			 :error-color error-color
+			 :probe probe
+			 :if-exists if-exists
+			 :if-does-not-exist if-does-not-exist))))
+    (let ((url
+	   (prompt msg :default default
+		   :required-p required-p
+		   :validator (clavier:valid-url)
+		   :if-invalid (or if-wrong-input
+				   (lambda (&optional value)
+				     (msg "Invalid url" :color error-color)))
+		   :color color
+		   :error-color error-color)))
+      (when probe
+	(multiple-value-bind (result status)
+	    (ignore-errors (drakma:http-request url))
+	  (if (member status (list 200 302))
+	      (when if-exists
+		(funcall if-exists))
+	      ;; else
+	      (ecase if-does-not-exist
+		(:error 
+		 (msg "The url does not exist." :color error-color)
+		 (recurse))
+		(:warn
+		 (msg "The url does not exist." :color error-color)
+		 (when (not (ask "Continue?:" :default nil))
+		   (recurse)))
+		(:warn-and-continue
+		 (msg "The url does not exist." :color error-color))
+		(:warn-and-ask-again
+		 (msg "The url does not exist." :color error-color)
+		 (recurse))))))
+	url)))
 
 (defun prompt-datetime (&optional msg &key default 
 					(required-p t) 
