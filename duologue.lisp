@@ -93,6 +93,10 @@
          - color: Color to use at prompt. Default: *prompt-color*
          - error-color: Color to use when error ocurrs. Default: *prompt-error-color*
 
+  Example: 
+
+    ``(choose \"Choose: \" (list \"foo\" \"bar\" \"baz\") :default \"baz\")``
+
   Tags: menu, choose" 
   (flet ((print-options ()
 	   (loop 
@@ -144,6 +148,13 @@
 					    if-wrong-answer
 					    (color *prompt-color*)
 					    (error-color *prompt-error-color*))
+  "Ask for yes or no.
+
+   Args: - msg(string): The prompt to use. Default: 'Yes or no: '.
+         - default: Default value. It gets selected if the user enters the empty string. Default: nil.
+         - if-wrong-answer(function): Function to execute if a wrong answer is given.
+         - color: Prompt color.
+         - error-color: Prompt error color."
   (check-type default boolean)
   (labels ((format-boolean (boolean)
 	     (if boolean "yes" "no"))
@@ -175,6 +186,15 @@
 			       if-invalid
 			       (color *prompt-color*)
 			       (error-color *prompt-error-color*))
+  "Prompt for a string.
+
+   Args: - msg: The prompt.
+         - default: Default value. This is returned if the user enters the empty string. Default: nil.
+         - required-p(boolean): If T, then the empty string is not allowed as a valid input, and the user is asked again for input. Default: t.
+         - validator(function): A function to use to validate the input. Should return T if the input is valid, or NIL otherwise.
+         - if-invalid(function): Function to execute if the validator fails.
+         - color: Prompt color
+         - error-color: Prompt error color."         
   (loop do
        (when msg
 	 (say msg :color color))
