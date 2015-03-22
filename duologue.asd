@@ -1,5 +1,5 @@
 (asdf:defsystem #:duologue
-  :description "High-level interaction library for Common Lisp"
+  :description "High-level user interaction library for Common Lisp"
   :author "Mariano Montone <marianomontone@gmail.com>"
   :license "MIT"
   :serial t

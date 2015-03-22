@@ -10,4 +10,5 @@
 	   :prompt-email
 	   :prompt-url
 	   :prompt-datetime
-	   :parse-prompt))
+	   :parse-prompt)
+  (:documentation "High-level interaction library for Common Lisp"))
