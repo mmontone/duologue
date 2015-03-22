@@ -3,7 +3,7 @@
 High-level interaction library for Common Lisp
 
 ## Functions
-### ask (&optional (msg Yes or no: ) &key (default nil default-p) if-wrong-answer (color \*prompt-color\*) (error-color \*prompt-error-color\*))
+### ask (&optional (msg "Yes or no: ") &key (default nil default-p) if-wrong-answer (color \*prompt-color\*) (error-color \*prompt-error-color\*))
 Ask for yes or no.
 
 - **msg**: (string) The prompt to use. Default: 'Yes or no: '.
@@ -15,7 +15,7 @@ Ask for yes or no.
 
 
 
-### choose (msg options &key if-wrong-option default (print-options t) (separator ~%) complete (color \*prompt-color\*) (error-color \*prompt-error-color\*))
+### choose (msg options &key if-wrong-option default (print-options t) (separator "~%") complete (color \*prompt-color\*) (error-color \*prompt-error-color\*))
 Asks the user to choose one of the given options.
 
 - **msg**: (string) The prompt message.
@@ -37,7 +37,7 @@ Example:
 **Tags**: menu, choose
 
 
-### choose-many (msg options &key if-wrong-option default (print-options t) (separator ~%) complete (test (function eql)) (color \*prompt-color\*) (error-color \*prompt-error-color\*))
+### choose-many (msg options &key if-wrong-option default (print-options t) (separator "~%") complete (test (function eql)) (color \*prompt-color\*) (error-color \*prompt-error-color\*))
 Asks the user to choose many of the given options.
 
 - **msg**: (string) The prompt message.
@@ -101,10 +101,10 @@ Prompts for a timestamp.
 - **error-color**: Prompt error color.
 
 
+**Returns**: the parsed local-time
+
 The input is parsed with chronicity library and transformed to a local-time. 
    The input is validated and the process does not stop until the user enters a valid timestamp address.
-
-   Return: the parsed local-time
 
 ### prompt-email (&optional msg &key default (required-p t) if-invalid (color \*prompt-color\*) (error-color \*prompt-error-color\*))
 Prompts for an email.
@@ -117,9 +117,9 @@ Prompts for an email.
 - **error-color**: Prompt error color.
 
 
-The email is validated and the process does not stop until the user enters a valid email address.
+**Returns**: the entered email
 
-   Return: the entered email
+The email is validated and the process does not stop until the user enters a valid email address.
 
 ### prompt-integer (&optional msg &key default (required-p t) if-invalid (color \*prompt-color\*) (error-color \*prompt-error-color\*))
 Prompts for an integer.
@@ -136,7 +136,7 @@ Prompts for an integer.
 
 
 
-### prompt-pathname (&optional msg &key default (required-p t) if-invalid (color \*prompt-color\*) (error-color \*prompt-error-color\*) probe if-exists (if-does-not-exist error) absolute-p file-type directory-p)
+### prompt-pathname (&optional msg &key default (required-p t) if-invalid (color \*prompt-color\*) (error-color \*prompt-error-color\*) probe if-exists (if-does-not-exist :error) absolute-p file-type directory-p)
 Prompts for a pathname.
 
 - **msg**: The prompt.
@@ -157,7 +157,7 @@ Prompts for a pathname.
 
 
 
-### prompt-url (&optional msg &key default (required-p t) if-invalid (color \*prompt-color\*) (error-color \*prompt-error-color\*) probe if-exists (if-does-not-exist error))
+### prompt-url (&optional msg &key default (required-p t) if-invalid (color \*prompt-color\*) (error-color \*prompt-error-color\*) probe if-exists (if-does-not-exist :error))
 Prompts for an url.
 
 - **msg**: The prompt.

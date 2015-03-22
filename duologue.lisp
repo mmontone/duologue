@@ -230,8 +230,9 @@
          - if-invalid(function): Function to execute if the validator fails.
          - color: Prompt color
          - error-color: Prompt error color.
-
-  Returns: The parsed value or the default value, depending on what the user entered"
+  
+  Returns: The parsed value or the default value, depending on what the user entered
+  "
   (loop do
        (when msg
 	 (say msg :color color))
@@ -294,9 +295,9 @@
          - color: Prompt color
          - error-color: Prompt error color.
 
-   The email is validated and the process does not stop until the user enters a valid email address.
+   Returns: the entered email
 
-   Return: the entered email"
+   The email is validated and the process does not stop until the user enters a valid email address."
   (prompt msg :default default
 	  :required-p required-p
 	  :validator (clavier:valid-email)
@@ -457,10 +458,10 @@
          - color: Prompt color
          - error-color: Prompt error color.
 
-   The input is parsed with chronicity library and transformed to a local-time. 
-   The input is validated and the process does not stop until the user enters a valid timestamp address.
+   Returns: the parsed local-time
 
-   Return: the parsed local-time"
+   The input is parsed with chronicity library and transformed to a local-time. 
+   The input is validated and the process does not stop until the user enters a valid timestamp address."
 
   (parse-prompt #'chronicity:parse msg
 		:default default
