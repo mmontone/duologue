@@ -1,2 +1,3 @@
-# term-query
-Terminal queries library for Common Lisp
+# duologue
+
+High level user interaction library for Common Lisp

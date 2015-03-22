@@ -1,4 +1,4 @@
-(defpackage #:term-query
+(defpackage #:duologue
   (:use #:cl #:anaphora)
   (:export :ask
 	   :msg

@@ -1,10 +1,10 @@
-(asdf:defsystem #:term-query
-  :description "High-level terminal interaction library"
+(asdf:defsystem #:duologue
+  :description "High-level interaction library for Common Lisp"
   :author "Mariano Montone <marianomontone@gmail.com>"
   :license "MIT"
   :serial t
   :components ((:file "package")
-               (:file "term-query"))
+               (:file "duologue"))
   :depends-on (:anaphora
 	       :alexandria
 	       :clavier 

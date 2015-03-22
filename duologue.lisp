@@ -1,4 +1,4 @@
-(in-package #:term-query)
+(in-package #:duologue)
 
 (defparameter *prompt-color* nil)
 (defparameter *prompt-error-color* nil)
