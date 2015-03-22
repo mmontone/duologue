@@ -24,15 +24,18 @@
 	   (return-from find-option (car args))))
     nil))
   
-(defun msg (msg &rest args)
-  (apply #'msg* msg args)
-  (terpri t))
-
-(defun msg* (msg &rest args)
-  (aif (find-option args :color)
-       (cl-ansi-text:with-color (it)
-	 (apply #'format t (cons msg (remove-options args :color))))
-       (apply #'format t (cons msg args))))
+(defun say (datum &rest args)
+  (let ((format-args (remove-options args :color :newline))
+	(color (find-option args :color))
+	(newline (find-option args :newline)))
+    (if color
+	 (cl-ansi-text:with-color (color)
+	   (apply #'format t (cons datum format-args)))
+	 ; else
+	 (apply #'format t (cons datum format-args)))
+    (when (or newline
+	      (not (cl-ppcre:scan "[ \\t](\\e\\[\\d+(;\\d+)*m)?\\Z" datum)))
+      (terpri))))
 
 (defun make-completer (options)
   (lambda (text start end)
@@ -73,9 +76,9 @@
 		(when (< (1+ i) (length options))
 		  (format t separator)))
 	   (terpri)
-	   (msg* msg :color color)
+	   (say msg :color color)
 	   (when default
-	     (msg* "[~A] " default :color color)))
+	     (say "[~A] " default :color color)))
 	 (read-option ()
 	   (if complete
 	       (progn
@@ -103,7 +106,7 @@
 		  (progn
 		    (if if-wrong-option
 			(funcall if-wrong-option)
-			(msg "Wrong option." :color error-color))
+			(say "Wrong option." :color error-color))
 		    (when print-options
 		      (print-options)))))
 	   (setf chosen-option (read-option))
@@ -118,9 +121,9 @@
   (labels ((format-boolean (boolean)
 	     (if boolean "yes" "no"))
 	   (ask-question ()
-	     (msg msg :color color)
+	     (say msg :color color)
 	     (when default-p
-	       (msg "[~A] " (format-boolean default) :color color))))
+	       (say "[~A] " (format-boolean default) :color color))))
     (ask-question)
     (let ((answer (read-line)))
       (loop
@@ -135,7 +138,7 @@
 	     (t 
 	      (if if-wrong-answer
 		  (funcall if-wrong-answer)
-		  (msg "Answer yes or no" :color error-color))
+		  (say "Answer yes or no" :color error-color))
 	      (ask-question)
 	      (setf answer (read-line))))))))
 
@@ -147,19 +150,19 @@
 			       (error-color *prompt-error-color*))
   (loop do
        (when msg
-	 (msg* msg :color color))
+	 (say msg :color color))
        (when default
-	 (msg* "[~A] " default :color color))
+	 (say "[~A] " default :color color))
        (let ((input (read-line)))
 	 (cond ((and (string-equal input "") default)
 		(return default))
 	       ((and (string-equal input "") required-p)
-		(msg "A non empty value is required" :color error-color))
+		(say "A non empty value is required" :color error-color))
 	       ((and validator
 		     (not (funcall validator input)))
 		(if if-invalid
 		    (funcall if-invalid input)
-		    (msg "The value is not valid" :color error-color)))
+		    (say "The value is not valid" :color error-color)))
 	       (t
 		(return input))))))
 
@@ -171,26 +174,26 @@
 					    (error-color *prompt-error-color*))
   (loop do
        (when msg
-	 (msg* msg :color color))
+	 (say msg :color color))
        (when default
-	 (msg* "[~A] " default :color color))
+	 (say "[~A] " default :color color))
        (let* ((input (read-line))
 	      (parsed-input (ignore-errors (funcall parser input))))
 	 (cond ((and (string-equal input "") default)
 		(return default))
 	       ((and (string-equal input "") required-p)
-		(msg "A non empty value is required" :color error-color))
+		(say "A non empty value is required" :color error-color))
 	       ((and (string-equal input "") (not required-p))
 		(return nil))
 	       ((not parsed-input)
 		(if if-invalid
 		    (funcall if-invalid)
-		    (msg "Invalid value" :color error-color)))
+		    (say "Invalid value" :color error-color)))
 	       ((and validator
 		     (not (funcall validator parsed-input)))
 		(if if-invalid
 		    (funcall if-invalid)
-		    (msg "Invalid value" :color error-color)))
+		    (say "Invalid value" :color error-color)))
 	       (parsed-input
 		(return parsed-input))))))	       
 
@@ -203,7 +206,7 @@
 		:default default
 		:required-p required-p
 		:if-invalid (or if-invalid 
-				(lambda () (msg "Error: Not a number" :color error-color)))
+				(lambda () (say "Error: Not a number" :color error-color)))
 		:color color
 		:error-color error-color))
 
@@ -217,7 +220,7 @@
 	  :validator (clavier:valid-email)
 	  :if-invalid (or if-invalid
 			  (lambda (&optional value)
-			    (msg "Invalid email" :color error-color)))
+			    (say "Invalid email" :color error-color)))
 	  :color color
 	  :error-color error-color))
 
@@ -245,7 +248,7 @@
 		   :validator (clavier:valid-url)
 		   :if-invalid (or if-invalid
 				   (lambda (&optional value)
-				     (msg "Invalid url" :color error-color)))
+				     (say "Invalid url" :color error-color)))
 		   :color color
 		   :error-color error-color)))
       (when probe
@@ -257,16 +260,16 @@
 	      ;; else
 	      (ecase if-does-not-exist
 		(:error 
-		 (msg "The url does not exist." :color error-color)
+		 (say "The url does not exist." :color error-color)
 		 (recurse))
 		(:warn
-		 (msg "The url does not exist." :color error-color)
+		 (say "The url does not exist." :color error-color)
 		 (when (not (ask "Continue?:" :default nil))
 		   (recurse)))
 		(:warn-and-continue
-		 (msg "The url does not exist." :color error-color))
+		 (say "The url does not exist." :color error-color))
 		(:warn-and-ask-again
-		 (msg "The url does not exist." :color error-color)
+		 (say "The url does not exist." :color error-color)
 		 (recurse))))))
 	url)))
 
@@ -303,7 +306,7 @@
 						   :pathname-type file-type)
 			 :if-invalid (or if-invalid
 					 (lambda (&optional value)
-					   (msg "Invalid url" :color error-color)))
+					   (say "Invalid url" :color error-color)))
 			 :color color
 			 :error-color error-color)))
       (when probe
@@ -313,16 +316,16 @@
 	    ;; else
 	    (ecase if-does-not-exist
 	      (:error 
-	       (msg "The pathname does not exist." :color error-color)
+	       (say "The pathname does not exist." :color error-color)
 	       (recurse))
 	      (:warn
-	       (msg "The pathname does not exist." :color error-color)
+	       (say "The pathname does not exist." :color error-color)
 	       (when (not (ask "Continue?:" :default nil))
 		 (recurse)))
 	      (:warn-and-continue
-	       (msg "The pathname does not exist." :color error-color))
+	       (say "The pathname does not exist." :color error-color))
 	      (:warn-and-ask-again
-	       (msg "The pathname does not exist." :color error-color)
+	       (say "The pathname does not exist." :color error-color)
 	       (recurse)))))
       pathname)))
 
@@ -335,7 +338,7 @@
 		:default default
 		:required-p required-p
 		:if-invalid (or if-invalid
-				(lambda () (msg "Error. Invalid timestamp"
+				(lambda () (say "Error. Invalid timestamp"
 						:color error-color)))
 		:color color
 		:error-color error-color))
@@ -358,10 +361,10 @@
 		  (when (< (1+ i) (length options))
 		    (format t separator)))
 	     (terpri)
-	     (msg "Chosen options: ~{~A~^, ~}" (reverse chosen-options))
-	     (msg* msg :color color)
+	     (say "Chosen options: ~{~A~^, ~}" (reverse chosen-options))
+	     (say msg :color color)
 	     (when default
-	       (msg* "[~A] " default :color color)))
+	       (say "[~A] " default :color color)))
 	   (read-option ()
 	     (if complete
 		 (progn
@@ -394,7 +397,7 @@
 		    (progn
 		      (if if-wrong-option
 			  (funcall if-wrong-option)
-			  (msg "Wrong option." :color error-color))
+			  (say "Wrong option." :color error-color))
 		      (when print-options
 			(print-options)))))
 	     (setf chosen-option (read-option))

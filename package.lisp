@@ -1,8 +1,7 @@
 (defpackage #:duologue
   (:use #:cl #:anaphora)
-  (:export :ask
-	   :msg
-	   :msg*
+  (:export :say
+	   :ask
 	   :choose
 	   :choose-many
 	   :prompt
@@ -10,5 +9,6 @@
 	   :prompt-email
 	   :prompt-url
 	   :prompt-datetime
+	   :prompt-pathname
 	   :parse-prompt)
   (:documentation "High-level interaction library for Common Lisp"))
