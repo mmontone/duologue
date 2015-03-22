@@ -31,7 +31,7 @@ Asks the user to choose one of the given options.
 
 Example: 
 
-    ```
+  ```
 (choose "Choose: " (list "foo" "bar" "baz") :default "baz")
 ```
 **Tags**: menu, choose
@@ -62,7 +62,8 @@ Prints a message on the screen.
 
 A newline is printed iff either newline parameter is T or datum doesn't end with a space. That is, if datum ends in a space, then no newline is printed.
 
-   Example: 
+   Example:
+ 
    ```
 (say "Hello ~A" "John" :color :blue)
 ```
