@@ -6,7 +6,8 @@ High-level interaction library for Common Lisp
 ### ask
 
 ```lisp
-(&optional (msg "Yes or no: ") &key (default nil default-p) if-wrong-answer (color \*prompt-color\*) (error-color \*prompt-error-color\*))
+(&optional (msg "Yes or no: ") &key (default nil default-p) if-wrong-answer
+ (color *prompt-color*) (error-color *prompt-error-color*))
 ```
 
 Ask for yes or no.
@@ -23,7 +24,8 @@ Ask for yes or no.
 ### choose
 
 ```lisp
-(msg options &key if-wrong-option default (print-options t) (separator "~%") complete (color \*prompt-color\*) (error-color \*prompt-error-color\*))
+(msg options &key if-wrong-option default (print-options t) (separator "~%")
+ complete (color *prompt-color*) (error-color *prompt-error-color*))
 ```
 
 Asks the user to choose one of the given options.
@@ -50,7 +52,9 @@ Example:
 ### choose-many
 
 ```lisp
-(msg options &key if-wrong-option default (print-options t) (separator "~%") complete (test (function eql)) (color \*prompt-color\*) (error-color \*prompt-error-color\*))
+(msg options &key if-wrong-option default (print-options t) (separator "~%")
+ complete (test #'eql) (color *prompt-color*)
+ (error-color *prompt-error-color*))
 ```
 
 Asks the user to choose many of the given options.
@@ -77,7 +81,8 @@ Example:
 ### parse-prompt
 
 ```lisp
-(parser &optional msg &key default (required-p t) validator if-invalid (color \*prompt-color\*) (error-color \*prompt-error-color\*))
+(parser &optional msg &key default (required-p t) validator if-invalid
+ (color *prompt-color*) (error-color *prompt-error-color*))
 ```
 
 Like prompt, but parses its input.
@@ -99,7 +104,8 @@ Like prompt, but parses its input.
 ### prompt
 
 ```lisp
-(&optional msg &key default (required-p t) validator if-invalid (color \*prompt-color\*) (error-color \*prompt-error-color\*))
+(&optional msg &key default (required-p t) validator if-invalid
+ (color *prompt-color*) (error-color *prompt-error-color*))
 ```
 
 Prompt for a string.
@@ -118,7 +124,8 @@ Prompt for a string.
 ### prompt-datetime
 
 ```lisp
-(&optional msg &key default (required-p t) if-invalid (color \*prompt-color\*) (error-color \*prompt-error-color\*))
+(&optional msg &key default (required-p t) if-invalid (color *prompt-color*)
+ (error-color *prompt-error-color*))
 ```
 
 Prompts for a timestamp.
@@ -139,7 +146,8 @@ The input is parsed with chronicity library and transformed to a local-time.
 ### prompt-email
 
 ```lisp
-(&optional msg &key default (required-p t) if-invalid (color \*prompt-color\*) (error-color \*prompt-error-color\*))
+(&optional msg &key default (required-p t) if-invalid (color *prompt-color*)
+ (error-color *prompt-error-color*))
 ```
 
 Prompts for an email.
@@ -159,7 +167,8 @@ The email is validated and the process does not stop until the user enters a val
 ### prompt-integer
 
 ```lisp
-(&optional msg &key default (required-p t) if-invalid (color \*prompt-color\*) (error-color \*prompt-error-color\*))
+(&optional msg &key default (required-p t) if-invalid (color *prompt-color*)
+ (error-color *prompt-error-color*))
 ```
 
 Prompts for an integer.
@@ -179,7 +188,9 @@ Prompts for an integer.
 ### prompt-pathname
 
 ```lisp
-(&optional msg &key default (required-p t) if-invalid (color \*prompt-color\*) (error-color \*prompt-error-color\*) probe if-exists (if-does-not-exist :error) absolute-p file-type directory-p)
+(&optional msg &key default (required-p t) if-invalid (color *prompt-color*)
+ (error-color *prompt-error-color*) probe if-exists (if-does-not-exist :error)
+ absolute-p file-type directory-p)
 ```
 
 Prompts for a pathname.
@@ -205,7 +216,8 @@ Prompts for a pathname.
 ### prompt-url
 
 ```lisp
-(&optional msg &key default (required-p t) if-invalid (color \*prompt-color\*) (error-color \*prompt-error-color\*) probe if-exists (if-does-not-exist :error))
+(&optional msg &key default (required-p t) if-invalid (color *prompt-color*)
+ (error-color *prompt-error-color*) probe if-exists (if-does-not-exist :error))
 ```
 
 Prompts for an url.
