@@ -25,7 +25,7 @@ Ask for yes or no.
 
 ```lisp
 (msg options &key if-wrong-option default (print-options t) (separator "~%")
- complete (color *prompt-color*) (error-color *prompt-error-color*))
+ complete completer (color *prompt-color*) (error-color *prompt-error-color*))
 ```
 
 Asks the user to choose one of the given options.
@@ -37,6 +37,7 @@ Asks the user to choose one of the given options.
 - **print-options**: (boolean) Print the options on the screen. Default: T.
 - **separator**: (string) Separation string to use when printing the options. Default: '~%'
 - **complete**: If T, then readline completion is enabled. Default: nil.
+- **completer**: A custom completer. If NIL, then the default completer is used.
 - **color**: Color to use at prompt. Default: *prompt-color*
 - **error-color**: Color to use when error ocurrs. Default: *prompt-error-color*
 
@@ -53,7 +54,7 @@ Example:
 
 ```lisp
 (msg options &key if-wrong-option default (print-options t) (separator "~%")
- complete (test #'eql) (color *prompt-color*)
+ complete completer (test #'eql) (color *prompt-color*)
  (error-color *prompt-error-color*))
 ```
 
@@ -66,6 +67,7 @@ Asks the user to choose many of the given options.
 - **print-options**: (boolean) Print the options on the screen. Default: T.
 - **separator**: (string) Separation string to use when printing the options. Default: '~%'
 - **complete**: If T, then readline completion is enabled. Default: nil.
+- **completer**: A custom completer. If NIL, then the default completer is used.
 - **color**: Color to use at prompt. Default: *prompt-color*
 - **error-color**: Color to use when error ocurrs. Default: *prompt-error-color*
 
@@ -76,6 +78,18 @@ Example:
 (choose-many "Choose: " (list "foo" "bar" "baz") :default "baz")
 ```
 **Tags**: menu, choose
+
+
+### make-list-completer
+
+```lisp
+(options)
+```
+
+Makes a default completer from a list of options
+
+
+
 
 
 ### parse-prompt
@@ -104,7 +118,7 @@ Like prompt, but parses its input.
 ### prompt
 
 ```lisp
-(&optional msg &key default (required-p t) validator if-invalid
+(&optional msg &key default (required-p t) validator if-invalid completer
  (color *prompt-color*) (error-color *prompt-error-color*))
 ```
 
@@ -115,6 +129,7 @@ Prompt for a string.
 - **required-p**: (boolean) If T, then the empty string is not allowed as a valid input, and the user is asked again for input. Default: t.
 - **validator**: (function) A function to use to validate the input. Should return T if the input is valid, or NIL otherwise.
 - **if-invalid**: (function) Function to execute if the validator fails.
+- **completer**: A custom completer. Default: no completion.
 - **color**: Prompt color
 - **error-color**: Prompt error color.
 
@@ -271,12 +286,6 @@ A newline is printed iff either newline parameter is T or datum doesn't end with
 ## Generic-Functions
 ## Slot-Accessors
 ## Variables
-### \*prompt-color\*
-The default prompt color.
-
-### \*prompt-error-color\*
-The default error color
-
 ## Classs
 ## Conditions
 ## Constants
