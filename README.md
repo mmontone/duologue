@@ -3,7 +3,12 @@
 High-level interaction library for Common Lisp
 
 ## Functions
-### ask (&optional (msg "Yes or no: ") &key (default nil default-p) if-wrong-answer (color \*prompt-color\*) (error-color \*prompt-error-color\*))
+### ask
+
+```lisp
+(&optional (msg "Yes or no: ") &key (default nil default-p) if-wrong-answer (color \*prompt-color\*) (error-color \*prompt-error-color\*))
+```
+
 Ask for yes or no.
 
 - **msg**: (string) The prompt to use. Default: 'Yes or no: '.
@@ -15,7 +20,12 @@ Ask for yes or no.
 
 
 
-### choose (msg options &key if-wrong-option default (print-options t) (separator "~%") complete (color \*prompt-color\*) (error-color \*prompt-error-color\*))
+### choose
+
+```lisp
+(msg options &key if-wrong-option default (print-options t) (separator "~%") complete (color \*prompt-color\*) (error-color \*prompt-error-color\*))
+```
+
 Asks the user to choose one of the given options.
 
 - **msg**: (string) The prompt message.
@@ -31,13 +41,18 @@ Asks the user to choose one of the given options.
 
 Example: 
 
-  ```
+  ```lisp
 (choose "Choose: " (list "foo" "bar" "baz") :default "baz")
 ```
 **Tags**: menu, choose
 
 
-### choose-many (msg options &key if-wrong-option default (print-options t) (separator "~%") complete (test (function eql)) (color \*prompt-color\*) (error-color \*prompt-error-color\*))
+### choose-many
+
+```lisp
+(msg options &key if-wrong-option default (print-options t) (separator "~%") complete (test (function eql)) (color \*prompt-color\*) (error-color \*prompt-error-color\*))
+```
+
 Asks the user to choose many of the given options.
 
 - **msg**: (string) The prompt message.
@@ -53,13 +68,18 @@ Asks the user to choose many of the given options.
 
 Example: 
 
-  ```
+  ```lisp
 (choose-many "Choose: " (list "foo" "bar" "baz") :default "baz")
 ```
 **Tags**: menu, choose
 
 
-### parse-prompt (parser &optional msg &key default (required-p t) validator if-invalid (color \*prompt-color\*) (error-color \*prompt-error-color\*))
+### parse-prompt
+
+```lisp
+(parser &optional msg &key default (required-p t) validator if-invalid (color \*prompt-color\*) (error-color \*prompt-error-color\*))
+```
+
 Like prompt, but parses its input.
 
 - **parser**: A function that parses the input string. Should return NIL if it cannot parse.
@@ -76,7 +96,12 @@ Like prompt, but parses its input.
 
 
 
-### prompt (&optional msg &key default (required-p t) validator if-invalid (color \*prompt-color\*) (error-color \*prompt-error-color\*))
+### prompt
+
+```lisp
+(&optional msg &key default (required-p t) validator if-invalid (color \*prompt-color\*) (error-color \*prompt-error-color\*))
+```
+
 Prompt for a string.
 
 - **msg**: The prompt.
@@ -90,7 +115,12 @@ Prompt for a string.
 
 
 
-### prompt-datetime (&optional msg &key default (required-p t) if-invalid (color \*prompt-color\*) (error-color \*prompt-error-color\*))
+### prompt-datetime
+
+```lisp
+(&optional msg &key default (required-p t) if-invalid (color \*prompt-color\*) (error-color \*prompt-error-color\*))
+```
+
 Prompts for a timestamp.
 
 - **msg**: The prompt.
@@ -106,7 +136,12 @@ Prompts for a timestamp.
 The input is parsed with chronicity library and transformed to a local-time. 
    The input is validated and the process does not stop until the user enters a valid timestamp address.
 
-### prompt-email (&optional msg &key default (required-p t) if-invalid (color \*prompt-color\*) (error-color \*prompt-error-color\*))
+### prompt-email
+
+```lisp
+(&optional msg &key default (required-p t) if-invalid (color \*prompt-color\*) (error-color \*prompt-error-color\*))
+```
+
 Prompts for an email.
 
 - **msg**: The prompt.
@@ -121,7 +156,12 @@ Prompts for an email.
 
 The email is validated and the process does not stop until the user enters a valid email address.
 
-### prompt-integer (&optional msg &key default (required-p t) if-invalid (color \*prompt-color\*) (error-color \*prompt-error-color\*))
+### prompt-integer
+
+```lisp
+(&optional msg &key default (required-p t) if-invalid (color \*prompt-color\*) (error-color \*prompt-error-color\*))
+```
+
 Prompts for an integer.
 
 - **msg**: The prompt.
@@ -136,7 +176,12 @@ Prompts for an integer.
 
 
 
-### prompt-pathname (&optional msg &key default (required-p t) if-invalid (color \*prompt-color\*) (error-color \*prompt-error-color\*) probe if-exists (if-does-not-exist :error) absolute-p file-type directory-p)
+### prompt-pathname
+
+```lisp
+(&optional msg &key default (required-p t) if-invalid (color \*prompt-color\*) (error-color \*prompt-error-color\*) probe if-exists (if-does-not-exist :error) absolute-p file-type directory-p)
+```
+
 Prompts for a pathname.
 
 - **msg**: The prompt.
@@ -157,7 +202,12 @@ Prompts for a pathname.
 
 
 
-### prompt-url (&optional msg &key default (required-p t) if-invalid (color \*prompt-color\*) (error-color \*prompt-error-color\*) probe if-exists (if-does-not-exist :error))
+### prompt-url
+
+```lisp
+(&optional msg &key default (required-p t) if-invalid (color \*prompt-color\*) (error-color \*prompt-error-color\*) probe if-exists (if-does-not-exist :error))
+```
+
 Prompts for an url.
 
 - **msg**: The prompt.
@@ -180,7 +230,12 @@ Prompts for an url.
 
 
 
-### say (datum &rest args)
+### say
+
+```lisp
+(datum &rest args)
+```
+
 Prints a message on the screen.
 
 - **datum**: (string) A format like string.
@@ -193,7 +248,7 @@ A newline is printed iff either newline parameter is T or datum doesn't end with
 
    Example:
  
-   ```
+   ```lisp
 (say "Hello ~A" "John" :color :blue)
 ```
 **Categories**: printing
