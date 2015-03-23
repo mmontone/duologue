@@ -24,7 +24,8 @@
 	   (return-from find-option (car args))))
     nil))
 
-(defun make-completer (options)
+(defun make-list-completer (options)
+  "Makes a default completer from a list of options"
   (lambda (text start end)
     (declare (ignorable start end))
     (labels ((common-prefix (items)
@@ -80,6 +81,7 @@
 			     (print-options t)
 			     (separator "~%")
 			     complete
+			     completer
 			     (color *prompt-color*)
 			     (error-color *prompt-error-color*))
   "Asks the user to choose one of the given options.
@@ -91,6 +93,7 @@
          - print-options(boolean): Print the options on the screen. Default: T.
          - separator(string): Separation string to use when printing the options. Default: '~%'
          - complete: If T, then readline completion is enabled. Default: nil.
+         - completer: A custom completer. If NIL, then the default completer is used.
          - color: Color to use at prompt. Default: *prompt-color*
          - error-color: Color to use when error ocurrs. Default: *prompt-error-color*
 
@@ -112,9 +115,9 @@
 	   (when default
 	     (say "[~A] " default :color color)))
 	 (read-option ()
-	   (if complete
+	   (if (or complete completer)
 	       (progn
-		 (rl:register-function :complete (make-completer options))
+		 (rl:register-function :complete (or completer (make-list-completer options)))
 		 (rl:readline :prompt (format nil "~A~@[[~A]~]" msg default)))
 	       (read-line))))
     (when print-options
@@ -185,6 +188,7 @@
 			       (required-p t) 
 			       validator 
 			       if-invalid
+			       completer
 			       (color *prompt-color*)
 			       (error-color *prompt-error-color*))
   "Prompt for a string.
@@ -194,25 +198,32 @@
          - required-p(boolean): If T, then the empty string is not allowed as a valid input, and the user is asked again for input. Default: t.
          - validator(function): A function to use to validate the input. Should return T if the input is valid, or NIL otherwise.
          - if-invalid(function): Function to execute if the validator fails.
+         - completer: A custom completer. Default: no completion.
          - color: Prompt color
-         - error-color: Prompt error color."         
-  (loop do
-       (when msg
-	 (say msg :color color))
-       (when default
-	 (say "[~A] " default :color color))
-       (let ((input (read-line)))
-	 (cond ((and (string-equal input "") default)
-		(return default))
-	       ((and (string-equal input "") required-p)
-		(say "A non empty value is required" :color error-color))
-	       ((and validator
-		     (not (funcall validator input)))
-		(if if-invalid
-		    (funcall if-invalid input)
-		    (say "The value is not valid" :color error-color)))
-	       (t
-		(return input))))))
+         - error-color: Prompt error color."
+  (flet ((read-input ()
+	   (if completer
+	       (progn
+		 (rl:register-function :complete completer)
+		 (rl:readline :prompt (format nil "~A~@[[~A]~]" msg default)))
+	       (read-line))))
+    (loop do
+	 (when msg
+	   (say msg :color color))
+	 (when default
+	   (say "[~A] " default :color color))
+	 (let ((input (read-input)))
+	   (cond ((and (string-equal input "") default)
+		  (return default))
+		 ((and (string-equal input "") required-p)
+		  (say "A non empty value is required" :color error-color))
+		 ((and validator
+		       (not (funcall validator input)))
+		  (if if-invalid
+		      (funcall if-invalid input)
+		      (say "The value is not valid" :color error-color)))
+		 (t
+		  (return input)))))))
 
 (defun parse-prompt (parser &optional msg &key default 
 					    (required-p t) 
@@ -477,6 +488,7 @@
 				  (print-options t)
 				  (separator "~%")
 				  complete
+				  completer
 				  (test #'eql)
 				  (color *prompt-color*)
 				  (error-color *prompt-error-color*))
@@ -489,6 +501,7 @@
          - print-options(boolean): Print the options on the screen. Default: T.
          - separator(string): Separation string to use when printing the options. Default: '~%'
          - complete: If T, then readline completion is enabled. Default: nil.
+         - completer: A custom completer. If NIL, then the default completer is used.
          - color: Color to use at prompt. Default: *prompt-color*
          - error-color: Color to use when error ocurrs. Default: *prompt-error-color*
 
@@ -512,9 +525,9 @@
 	     (when default
 	       (say "[~A] " default :color color)))
 	   (read-option ()
-	     (if complete
+	     (if (or complete completer)
 		 (progn
-		   (rl:register-function :complete (make-completer options))
+		   (rl:register-function :complete (or completer (make-list-completer options)))
 		   (rl:readline :prompt (format nil "~A~@[[~A]~]" msg default)))
 		 (read-line))))
       (when print-options

@@ -10,5 +10,6 @@
 	   :prompt-url
 	   :prompt-datetime
 	   :prompt-pathname
-	   :parse-prompt)
+	   :parse-prompt
+	   :make-list-completer)
   (:documentation "High-level interaction library for Common Lisp"))
