@@ -193,6 +193,7 @@
 			       (required-p t) 
 			       validator 
 			       if-invalid
+			       parser
 			       completer
 			       (color *prompt-color*)
 			       (error-color *prompt-error-color*))
@@ -203,30 +204,39 @@
          - required-p(boolean): If T, then the empty string is not allowed as a valid input, and the user is asked again for input. Default: t.
          - validator(function): A function to use to validate the input. Should return T if the input is valid, or NIL otherwise.
          - if-invalid(function): Function to execute if the validator fails.
+         - parser (function): A function to parse the input string.
          - completer: A custom completer. Default: no completion.
          - color: Prompt color
          - error-color: Prompt error color."
   (flet ((read-input ()
-	   (cond 
-	     (completer
-	      (let ((prompt (if color 
-				(with-output-to-string (s)
-				  (cl-ansi-text:with-color (color :stream s)
-				    (format s "~A~@[[~A]~]" msg default)))
-				(format nil "~A~@[[~A]~]" msg default))))
-		(rl:register-function :complete completer)
-		(rl:readline :prompt prompt)))
-	     ((not completer)
-	      (when msg
-		(say msg :color color))
-	      (when default
-		(say "[~A] " default :color color))
-	      (read-line)))))
+	   (let ((raw-input
+		  (cond 
+		    (completer
+		     (let ((prompt (if color 
+				       (with-output-to-string (s)
+					 (cl-ansi-text:with-color (color :stream s)
+					   (format s "~A~@[[~A]~]" msg default)))
+				       (format nil "~A~@[[~A]~]" msg default))))
+		       (rl:register-function :complete completer)
+		       (string-trim (list #\ ) (rl:readline :prompt prompt))))
+		    ((not completer)
+		     (when msg
+		       (say msg :color color))
+		     (when default
+		       (say "[~A] " default :color color))
+		     (string-trim (list #\ ) (read-line))))))
+	     (if parser
+		 (ignore-errors (funcall parser raw-input))
+		 raw-input))))
     (loop do
 	 (let ((input (read-input)))
-	   (cond ((and (string-equal input "") default)
+	   (cond ((not input)
+		  (if if-invalid
+		      (funcall if-invalid)
+		      (say "Invalid value" :color error-color)))
+		 ((and (equalp input "") default)
 		  (return default))
-		 ((and (string-equal input "") required-p)
+		 ((and (equalp input "") required-p)
 		  (say "A non empty value is required" :color error-color))
 		 ((and validator
 		       (not (funcall validator input)))
@@ -235,50 +245,6 @@
 		      (say "The value is not valid" :color error-color)))
 		 (t
 		  (return input)))))))
-
-(defun parse-prompt (parser &optional msg &key default 
-					    (required-p t) 
-					    validator
-					    if-invalid
-					    (color *prompt-color*)
-					    (error-color *prompt-error-color*))
-  "Like prompt, but parses its input.
-
-   Args: - parser: A function that parses the input string. Should return NIL if it cannot parse.
-         - msg: The prompt.
-         - default: Default value. This is returned if the user enters the empty string. Default: nil.
-         - required-p(boolean): If T, then the empty string is not allowed as a valid input, and the user is asked again for input. Default: t.
-         - validator(function): A function to use to validate the input. Should return T if the input is valid, or NIL otherwise.
-         - if-invalid(function): Function to execute if the validator fails.
-         - color: Prompt color
-         - error-color: Prompt error color.
-  
-  Returns: The parsed value or the default value, depending on what the user entered
-  "
-  (loop do
-       (when msg
-	 (say msg :color color))
-       (when default
-	 (say "[~A] " default :color color))
-       (let* ((input (read-line))
-	      (parsed-input (ignore-errors (funcall parser input))))
-	 (cond ((and (string-equal input "") default)
-		(return default))
-	       ((and (string-equal input "") required-p)
-		(say "A non empty value is required" :color error-color))
-	       ((and (string-equal input "") (not required-p))
-		(return nil))
-	       ((not parsed-input)
-		(if if-invalid
-		    (funcall if-invalid)
-		    (say "Invalid value" :color error-color)))
-	       ((and validator
-		     (not (funcall validator parsed-input)))
-		(if if-invalid
-		    (funcall if-invalid)
-		    (say "Invalid value" :color error-color)))
-	       (parsed-input
-		(return parsed-input))))))
 
 (defun prompt-integer (&optional msg &key default 
 				       (required-p t) 
@@ -295,13 +261,14 @@
          - error-color: Prompt error color.
 
    Returns: the entered number"
-  (parse-prompt #'parse-integer msg 
-		:default default
-		:required-p required-p
-		:if-invalid (or if-invalid 
-				(lambda () (say "Error: Not a number" :color error-color)))
-		:color color
-		:error-color error-color))
+  (prompt msg 
+	  :parser #'parse-integer 
+	  :default default
+	  :required-p required-p
+	  :if-invalid (or if-invalid 
+			  (lambda () (say "Error: Not a number" :color error-color)))
+	  :color color
+	  :error-color error-color))
 
 (defun prompt-email (&optional msg &key default 
 				     (required-p t) 
@@ -498,14 +465,15 @@
    The input is parsed with chronicity library and transformed to a local-time. 
    The input is validated and the process does not stop until the user enters a valid timestamp address."
 
-  (parse-prompt #'chronicity:parse msg
-		:default default
-		:required-p required-p
-		:if-invalid (or if-invalid
-				(lambda () (say "Error. Invalid timestamp"
-						:color error-color)))
-		:color color
-		:error-color error-color))
+  (prompt msg
+	  :parser #'chronicity:parse
+	  :default default
+	  :required-p required-p
+	  :if-invalid (or if-invalid
+			  (lambda () (say "Error. Invalid timestamp"
+					  :color error-color)))
+	  :color color
+	  :error-color error-color))
 
 (defun choose-many (msg options &key if-wrong-option 
 				  default 

@@ -92,34 +92,11 @@ Makes a default completer from a list of options
 
 
 
-### parse-prompt
-
-```lisp
-(parser &optional msg &key default (required-p t) validator if-invalid
- (color *prompt-color*) (error-color *prompt-error-color*))
-```
-
-Like prompt, but parses its input.
-
-- **parser**: A function that parses the input string. Should return NIL if it cannot parse.
-- **msg**: The prompt.
-- **default**: Default value. This is returned if the user enters the empty string. Default: nil.
-- **required-p**: (boolean) If T, then the empty string is not allowed as a valid input, and the user is asked again for input. Default: t.
-- **validator**: (function) A function to use to validate the input. Should return T if the input is valid, or NIL otherwise.
-- **if-invalid**: (function) Function to execute if the validator fails.
-- **color**: Prompt color
-- **error-color**: Prompt error color.
-
-
-**Returns**: The parsed value or the default value, depending on what the user entered
-
-
-
 ### prompt
 
 ```lisp
-(&optional msg &key default (required-p t) validator if-invalid completer
- (color *prompt-color*) (error-color *prompt-error-color*))
+(&optional msg &key default (required-p t) validator if-invalid parser
+ completer (color *prompt-color*) (error-color *prompt-error-color*))
 ```
 
 Prompt for a string.
@@ -129,6 +106,7 @@ Prompt for a string.
 - **required-p**: (boolean) If T, then the empty string is not allowed as a valid input, and the user is asked again for input. Default: t.
 - **validator**: (function) A function to use to validate the input. Should return T if the input is valid, or NIL otherwise.
 - **if-invalid**: (function) Function to execute if the validator fails.
+- **parser**: (function) A function to parse the input string.
 - **completer**: A custom completer. Default: no completion.
 - **color**: Prompt color
 - **error-color**: Prompt error color.
