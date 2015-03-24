@@ -209,42 +209,42 @@
          - color: Prompt color
          - error-color: Prompt error color."
   (flet ((read-input ()
-	   (let ((raw-input
-		  (cond 
-		    (completer
-		     (let ((prompt (if color 
-				       (with-output-to-string (s)
-					 (cl-ansi-text:with-color (color :stream s)
-					   (format s "~A~@[[~A]~]" msg default)))
-				       (format nil "~A~@[[~A]~]" msg default))))
-		       (rl:register-function :complete completer)
-		       (string-trim (list #\ ) (rl:readline :prompt prompt))))
-		    ((not completer)
-		     (when msg
-		       (say msg :color color))
-		     (when default
-		       (say "[~A] " default :color color))
-		     (string-trim (list #\ ) (read-line))))))
-	     (if parser
-		 (ignore-errors (funcall parser raw-input))
-		 raw-input))))
+	   (cond 
+	     (completer
+	      (let ((prompt (if color 
+				(with-output-to-string (s)
+				  (cl-ansi-text:with-color (color :stream s)
+				    (format s "~A~@[[~A]~]" msg default)))
+				(format nil "~A~@[[~A]~]" msg default))))
+		(rl:register-function :complete completer)
+		(string-trim (list #\ ) (rl:readline :prompt prompt))))
+	     ((not completer)
+	      (when msg
+		(say msg :color color))
+	      (when default
+		(say "[~A] " default :color color))
+	      (string-trim (list #\ ) (read-line))))))
     (loop do
 	 (let ((input (read-input)))
-	   (cond ((not input)
-		  (if if-invalid
-		      (funcall if-invalid)
-		      (say "Invalid value" :color error-color)))
-		 ((and (equalp input "") default)
+	   (cond ((and (equalp input "") default)
 		  (return default))
 		 ((and (equalp input "") required-p)
 		  (say "A non empty value is required" :color error-color))
-		 ((and validator
-		       (not (funcall validator input)))
-		  (if if-invalid
-		      (funcall if-invalid input)
-		      (say "The value is not valid" :color error-color)))
-		 (t
-		  (return input)))))))
+		 (t (let ((parsed-input (or (and parser 
+						 (ignore-errors (funcall parser input)))
+					    input)))
+		      (cond
+			((not parsed-input)
+			 (if if-invalid
+			     (funcall if-invalid)
+			     (say "Invalid value" :color error-color)))
+			((and validator
+			      (not (funcall validator parsed-input)))
+			 (if if-invalid
+			     (funcall if-invalid parsed-input)
+			     (say "The value is not valid" :color error-color)))
+			(t
+			 (return parsed-input))))))))))
 
 (defun prompt-integer (&optional msg &key default 
 				       (required-p t) 
