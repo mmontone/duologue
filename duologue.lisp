@@ -405,7 +405,8 @@
 					(if-does-not-exist :error)
 					absolute-p
 					file-type
-					directory-p)
+					directory-p
+					(complete t))
   "Prompts for a pathname.
 
    Args: - msg: The prompt.
@@ -414,6 +415,7 @@
          - if-invalid(function): Function to execute if the validator fails.
          - color: Prompt color
          - error-color: Prompt error color.
+         - complete: If T, then uses readline path completion. Default: T.
          - probe. If T, checks that the file exists on the filesystem.
          - if-exists: Function to call if the probe is successful.
          - if-does-not-exist(keyword): One of:
@@ -433,38 +435,56 @@
 			      :if-does-not-exist if-does-not-exist
 			      :absolute-p absolute-p
 			      :file-type file-type))))
-    (let ((pathname
-	   (parse-prompt #'pathname
-			 msg 
-			 :default default
-			 :required-p required-p
-			 :validator (make-instance 'clavier:pathname-validator
-						   :absolute-p absolute-p
-						   :pathname-type file-type)
-			 :if-invalid (or if-invalid
-					 (lambda (&optional value)
-					   (say "Invalid url" :color error-color)))
-			 :color color
-			 :error-color error-color)))
-      (when probe
-	(if (probe-file pathname)
-	    (when if-exists
-	      (funcall if-exists))
-	    ;; else
-	    (ecase if-does-not-exist
-	      (:error 
-	       (say "The pathname does not exist." :color error-color)
-	       (recurse))
-	      (:warn
-	       (say "The pathname does not exist." :color error-color)
-	       (when (not (ask "Continue?:" :default nil))
-		 (recurse)))
-	      (:warn-and-continue
-	       (say "The pathname does not exist." :color error-color))
-	      (:warn-and-ask-again
-	       (say "The pathname does not exist." :color error-color)
-	       (recurse)))))
-      pathname)))
+    (flet ((read-input ()
+	     (cond 
+	       (complete
+		(let ((prompt (if color 
+				  (with-output-to-string (s)
+				    (cl-ansi-text:with-color (color :stream s)
+				      (format s "~@[~A~]~@[[~A]~]" msg default)))
+				  (format nil "~@[~A~]~@[[~A]~]" msg default))))
+		  (rl:readline :prompt prompt)))
+	       ((not complete)
+		(when msg
+		  (say msg :color color))
+		(when default
+		  (say "[~A] " default :color color))
+		(read-line)))))
+      (let ((pathname
+	     (loop do
+		  (let* ((input (read-input))
+			 (parsed-input (ignore-errors (funcall #'pathname input))))
+		    (cond ((and (string-equal input "") default)
+			   (return default))
+			  ((and (string-equal input "") required-p)
+			   (say "A non empty value is required" :color error-color))
+			  ((and (string-equal input "") (not required-p))
+			   (return nil))
+			  ((not parsed-input)
+			   (if if-invalid
+			       (funcall if-invalid)
+			       (say "Invalid value" :color error-color)))
+			  (parsed-input
+			   (return parsed-input)))))))
+	(when probe
+	  (if (probe-file pathname)
+	      (when if-exists
+		(funcall if-exists))
+	      ;; else
+	      (ecase if-does-not-exist
+		(:error 
+		 (say "The pathname does not exist." :color error-color)
+		 (recurse))
+		(:warn
+		 (say "The pathname does not exist." :color error-color)
+		 (when (not (ask "Continue?:" :default nil))
+		   (recurse)))
+		(:warn-and-continue
+		 (say "The pathname does not exist." :color error-color))
+		(:warn-and-ask-again
+		 (say "The pathname does not exist." :color error-color)
+		 (recurse)))))
+	pathname))))
 
 (defun prompt-datetime (&optional msg &key default 
 					(required-p t) 
