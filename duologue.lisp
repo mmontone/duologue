@@ -350,8 +350,7 @@
          - if-does-not-exist(keyword): One of:
               * :error : Tries again until the url can be accessed.
               * :warn : Warns the user the url could not be accessed and asks for continuing.
-              * :warn-and-continue: Warns the user the url could not be accessed and continues.
-              * :warn-and-ask-again: Warns the user the url could not be accessed and asks for another url.
+              * :warn-and-continue: Warns the user the url could not be accessed and continues.              
 
    Returns: the entered url"
   (flet ((recurse ()
@@ -389,10 +388,7 @@
 		 (when (not (ask "Continue?:" :default nil))
 		   (recurse)))
 		(:warn-and-continue
-		 (say "The url does not exist." :color error-color))
-		(:warn-and-ask-again
-		 (say "The url does not exist." :color error-color)
-		 (recurse))))))
+		 (say "The url does not exist." :color error-color))))))
 	url)))
 
 (defun prompt-pathname (&optional msg &key default 
@@ -421,8 +417,7 @@
          - if-does-not-exist(keyword): One of:
               * :error : Tries again until the pathname can be accessed.
               * :warn : Warns the user the pathname could not be accessed and asks for continuing.
-              * :warn-and-continue: Warns the user the pathname could not be accessed and continues.
-              * :warn-and-ask-again: Warns the user the pathname could not be accessed and asks for another pathname."
+              * :warn-and-continue: Warns the user the pathname could not be accessed and continues."
   (flet ((recurse ()
 	   (return-from prompt-pathname
 	     (prompt-pathname msg :default default
@@ -481,9 +476,7 @@
 		   (recurse)))
 		(:warn-and-continue
 		 (say "The pathname does not exist." :color error-color))
-		(:warn-and-ask-again
-		 (say "The pathname does not exist." :color error-color)
-		 (recurse)))))
+		)))
 	pathname))))
 
 (defun prompt-datetime (&optional msg &key default 

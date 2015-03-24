@@ -205,7 +205,7 @@ Prompts for an integer.
 ```lisp
 (&optional msg &key default (required-p t) if-invalid (color *prompt-color*)
  (error-color *prompt-error-color*) probe if-exists (if-does-not-exist :error)
- absolute-p file-type directory-p)
+ absolute-p file-type directory-p (complete t))
 ```
 
 Prompts for a pathname.
@@ -216,13 +216,13 @@ Prompts for a pathname.
 - **if-invalid**: (function) Function to execute if the validator fails.
 - **color**: Prompt color
 - **error-color**: Prompt error color.
+- **complete**: If T, then uses readline path completion. Default: T.
 - probe. If T, checks that the file exists on the filesystem.
 - **if-exists**: Function to call if the probe is successful.
 - **if-does-not-exist**: (keyword) One of:
 * :error : Tries again until the pathname can be accessed.
 * :warn : Warns the user the pathname could not be accessed and asks for continuing.
 * :warn-and-continue: Warns the user the pathname could not be accessed and continues.
-* :warn-and-ask-again: Warns the user the pathname could not be accessed and asks for another pathname.
 
 
 
@@ -249,7 +249,6 @@ Prompts for an url.
 * :error : Tries again until the url can be accessed.
 * :warn : Warns the user the url could not be accessed and asks for continuing.
 * :warn-and-continue: Warns the user the url could not be accessed and continues.
-* :warn-and-ask-again: Warns the user the url could not be accessed and asks for another url.
 
 
 
