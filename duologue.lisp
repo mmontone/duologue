@@ -110,16 +110,22 @@
 		(format t "[~A] ~A" i option)
 		(when (< (1+ i) (length options))
 		  (format t separator)))
-	   (terpri)
-	   (say msg :color color)
-	   (when default
-	     (say "[~A] " default :color color)))
+	   (terpri))
 	 (read-option ()
-	   (if (or complete completer)
-	       (progn
+	   (cond 
+	     ((or complete completer)
+	      (let ((prompt (if color 
+				(with-output-to-string (s)
+				  (cl-ansi-text:with-color (color :stream s)
+				    (format s "~A~@[[~A]~]" msg default)))
+				(format nil "~A~@[[~A]~]" msg default))))
 		 (rl:register-function :complete (or completer (make-list-completer options)))
-		 (rl:readline :prompt (format nil "~A~@[[~A]~]" msg default)))
-	       (read-line))))
+		 (string-trim (list #\ ) (rl:readline :prompt prompt))))
+	     (t
+	      (say msg :color color)
+	      (when default
+		(say "[~A] " default :color color))
+	      (string-trim (list #\ ) (read-line))))))
     (when print-options
       (print-options))
     (let* ((chosen-option (read-option))
