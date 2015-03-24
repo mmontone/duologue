@@ -171,11 +171,11 @@
 	   (ask-question ()
 	     (say msg :color color)
 	     (when default-p
-	       (say "[~A] " (format-boolean default) :color color))))
-    (ask-question)
-    (let ((answer (read-line)))
+	       (say "[~A] " (format-boolean default) :color color))
+	     (string-trim (list #\ ) (read-line))))
+    (let ((answer (ask-question)))
       (loop
-	   do
+	 do
 	   (cond 
 	     ((and (equalp answer "") default-p)
 	      (return-from ask default))
@@ -187,8 +187,7 @@
 	      (if if-wrong-answer
 		  (funcall if-wrong-answer)
 		  (say "Answer yes or no" :color error-color))
-	      (ask-question)
-	      (setf answer (read-line))))))))
+	      (setf answer (ask-question))))))))
 
 (defun prompt (&optional msg &key default 
 			       (required-p t) 
