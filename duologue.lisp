@@ -202,16 +202,22 @@
          - color: Prompt color
          - error-color: Prompt error color."
   (flet ((read-input ()
-	   (if completer
-	       (progn
-		 (rl:register-function :complete completer)
-		 (rl:readline :prompt (format nil "~A~@[[~A]~]" msg default)))
-	       (read-line))))
+	   (cond 
+	     (completer
+	      (let ((prompt (if color 
+				(with-output-to-string (s)
+				  (cl-ansi-text:with-color (color :stream s)
+				    (format s "~A~@[[~A]~]" msg default)))
+				(format nil "~A~@[[~A]~]" msg default))))
+		(rl:register-function :complete completer)
+		(rl:readline :prompt prompt)))
+	     ((not completer)
+	      (when msg
+		(say msg :color color))
+	      (when default
+		(say "[~A] " default :color color))
+	      (read-line)))))
     (loop do
-	 (when msg
-	   (say msg :color color))
-	 (when default
-	   (say "[~A] " default :color color))
 	 (let ((input (read-input)))
 	   (cond ((and (string-equal input "") default)
 		  (return default))
