@@ -512,16 +512,22 @@
 		  (when (< (1+ i) (length options))
 		    (format t separator)))
 	     (terpri)
-	     (say "Chosen options: ~{~A~^, ~}" (reverse chosen-options))
-	     (say msg :color color)
-	     (when default
-	       (say "[~A] " default :color color)))
+	     (say "Chosen options: ~{~A~^, ~}" (reverse chosen-options)))
 	   (read-option ()
-	     (if (or complete completer)
-		 (progn
-		   (rl:register-function :complete (or completer (make-list-completer options)))
-		   (rl:readline :prompt (format nil "~A~@[[~A]~]" msg default)))
-		 (read-line))))
+	     (cond 
+	       ((or complete completer)
+		(let ((prompt (if color 
+				  (with-output-to-string (s)
+				    (cl-ansi-text:with-color (color :stream s)
+				      (format s "~A~@[[~A]~]" msg default)))
+				  (format nil "~A~@[[~A]~]" msg default))))
+		  (rl:register-function :complete (or completer (make-list-completer options)))
+		  (string-trim (list #\ ) (rl:readline :prompt prompt))))
+	       (t
+		(say msg :color color)
+		(when default
+		  (say "[~A] " default :color color))
+		(string-trim (list #\ ) (read-line))))))
       (when print-options
 	(print-options))
       (let* ((chosen-option (read-option))
