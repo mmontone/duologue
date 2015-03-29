@@ -1,6 +1,6 @@
 # DUOLOGUE
 
-High-level interaction library for Common Lisp
+Duologue is high-level interaction library for Common Lisp. Command line interaction is implemented at the moment. It features coloured printing via cl-ansi-text and readline completion.
 
 ## Functions
 ### ask
