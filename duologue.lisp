@@ -189,7 +189,8 @@
 		  (say "Answer yes or no" :color error-color))
 	      (setf answer (ask-question))))))))
 
-(defun prompt (&optional msg &key default 
+(defun prompt (&optional msg &key 
+			       (default nil default-p) 
 			       (required-p t) 
 			       validator 
 			       if-invalid
@@ -221,12 +222,12 @@
 	     ((not completer)
 	      (when msg
 		(say msg :color color))
-	      (when default
+	      (when default-p
 		(say "[~A] " default :color color))
 	      (string-trim (list #\ ) (read-line))))))
     (loop do
 	 (let ((input (read-input)))
-	   (cond ((and (equalp input "") default)
+	   (cond ((and (equalp input "") default-p)
 		  (return default))
 		 ((and (equalp input "") required-p)
 		  (say "A non empty value is required" :color error-color))
