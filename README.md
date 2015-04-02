@@ -261,14 +261,27 @@ A newline is printed iff either newline parameter is T or datum doesn't end with
 
 ## Macros
 ### while
-Control flow macro. 
-   Asks to repeat a task several times and collects its result.
 
-   Args: - msg: The thing to ask to confirm the task
-         - options: Options of the ask operation
-         - body: The task to execute while the user confirms it.
+```lisp
+(msg (&rest options) &body body)
+```
 
-   Returns: A list of collected task results
+Asks to repeat a task several times and collects its result.
+
+- **msg**: The thing to ask to confirm the task
+- **options**: Options of the ask operation
+- **body**: The task to execute while the user confirms it.
+
+
+**Returns**: A list of collected task results
+
+Example:
+     ```lisp
+(while "Add item?: " (:default t)
+           (prompt "Item: "))
+```
+**Tags**: flow
+
 
 ## Generic-Functions
 ## Slot-Accessors
