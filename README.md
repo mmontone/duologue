@@ -95,8 +95,8 @@ Makes a default completer from a list of options
 ### prompt
 
 ```lisp
-(&optional msg &key default (required-p t) validator if-invalid parser
- completer (color *prompt-color*) (error-color *prompt-error-color*))
+(&optional msg &key (default nil default-p) (required-p t) validator if-invalid
+ parser completer (color *prompt-color*) (error-color *prompt-error-color*))
 ```
 
 Prompt for a string.
@@ -260,6 +260,16 @@ A newline is printed iff either newline parameter is T or datum doesn't end with
 
 
 ## Macros
+### while
+Control flow macro. 
+   Asks to repeat a task several times and collects its result.
+
+   Args: - msg: The thing to ask to confirm the task
+         - options: Options of the ask operation
+         - body: The task to execute while the user confirms it.
+
+   Returns: A list of collected task results
+
 ## Generic-Functions
 ## Slot-Accessors
 ## Variables

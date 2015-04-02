@@ -560,3 +560,23 @@
 			(print-options)))))
 	     (setf chosen-option (read-option))
 	     (setf option-number (ignore-errors (parse-integer chosen-option))))))))
+
+(defmacro while (msg (&rest options) &body body)
+  "Asks to repeat a task several times and collects its result.
+
+   Args: - msg: The thing to ask to confirm the task
+         - options: Options of the ask operation
+         - body: The task to execute while the user confirms it.
+
+   Returns: A list of collected task results
+
+   Example:
+     ``(while \"Add item?: \" (:default t)
+           (prompt \"Item: \"))``
+
+   Tags: flow"
+ 
+  (alexandria:with-unique-names (result)
+    `(loop 
+	:while (ask ,msg ,@options)
+	:collect (progn ,@body))))

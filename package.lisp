@@ -11,5 +11,6 @@
 	   :prompt-datetime
 	   :prompt-pathname
 	   :parse-prompt
-	   :make-list-completer)
+	   :make-list-completer
+	   :while)
   (:documentation "High-level interaction library for Common Lisp"))
