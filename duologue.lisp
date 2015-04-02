@@ -577,6 +577,13 @@
    Tags: flow"
  
   (alexandria:with-unique-names (result)
-    `(loop 
-	:while (ask ,msg ,@options)
-	:collect (progn ,@body))))
+    `(block while
+       (let ((,result nil))
+	 (flet ((cancel ()
+		  (return-from while nil))
+		(continue* ()
+		  (return-from while ,result)))
+	   (loop 
+	      :while (ask ,msg ,@options)
+	      :do (setf ,result (append ,result (list (progn ,@body)))))
+	   ,result)))))
