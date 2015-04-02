@@ -576,13 +576,13 @@
 
    Tags: flow"
  
-  (alexandria:with-unique-names (result)
-    `(block while
+  (alexandria:with-unique-names (result while)
+    `(block ,while
        (let ((,result nil))
 	 (flet ((cancel ()
-		  (return-from while nil))
+		  (return-from ,while nil))
 		(continue* ()
-		  (return-from while ,result)))
+		  (return-from ,while ,result)))
 	   (loop 
 	      :while (ask ,msg ,@options)
 	      :do (setf ,result (append ,result (list (progn ,@body)))))
