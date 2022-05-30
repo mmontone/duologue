@@ -75,7 +75,7 @@ Asks the user to choose many of the given options.
 Example: 
 
   ```lisp
-(choose-many "Choose: " (list "foo" "bar" "baz") :default "baz")
+(choose-many "Choose: " (list "foo" "bar" "baz") :default '("baz"))
 ```
 **Tags**: menu, choose
 
