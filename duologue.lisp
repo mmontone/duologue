@@ -366,15 +366,16 @@
   (flet ((recurse ()
 	   (return-from prompt-pathname
 	     (prompt-pathname msg :default default
-			      :required-p required-p
-			      :if-invalid if-invalid
-			      :color color
-			      :error-color error-color
-			      :probe probe
-			      :if-exists if-exists
-			      :if-does-not-exist if-does-not-exist
-			      :absolute-p absolute-p
-			      :file-type file-type))))
+				  :required-p required-p
+				  :if-invalid if-invalid
+				  :color color
+				  :error-color error-color
+				  :probe probe
+				  :if-exists if-exists
+				  :if-does-not-exist if-does-not-exist
+				  :absolute-p absolute-p
+				  :file-type file-type
+				  :complete complete))))
     (flet ((read-input ()
 	     (cond 
 	       (complete
@@ -391,21 +392,21 @@
 		  (say "[~A] " default :color color))
 		(read-line)))))
       (let ((pathname
-	     (loop do
-		  (let* ((input (read-input))
-			 (parsed-input (ignore-errors (funcall #'pathname input))))
-		    (cond ((and (string-equal input "") default)
-			   (return default))
-			  ((and (string-equal input "") required-p)
-			   (say "A non empty value is required" :color error-color))
-			  ((and (string-equal input "") (not required-p))
-			   (return nil))
-			  ((not parsed-input)
-			   (if if-invalid
-			       (funcall if-invalid)
-			       (say "Invalid value" :color error-color)))
-			  (parsed-input
-			   (return parsed-input)))))))
+	      (loop do
+		(let* ((input (read-input))
+		       (parsed-input (ignore-errors (funcall #'pathname input))))
+		  (cond ((and (string-equal input "") default)
+			 (return default))
+			((and (string-equal input "") required-p)
+			 (say "A non empty value is required" :color error-color))
+			((and (string-equal input "") (not required-p))
+			 (return nil))
+			((not parsed-input)
+			 (if if-invalid
+			     (funcall if-invalid)
+			     (say "Invalid value" :color error-color)))
+			(parsed-input
+			 (return parsed-input)))))))
 	(when probe
 	  (if (probe-file pathname)
 	      (when if-exists
