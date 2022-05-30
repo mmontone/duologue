@@ -240,11 +240,14 @@
 
    Returns: the entered number"
   (prompt msg 
-	  :parser #'parse-integer 
+	  :parser #'parse-integer
+	  :validator (clavier:is-an-integer)
 	  :default default
 	  :required-p required-p
 	  :if-invalid (or if-invalid 
-			  (lambda () (say "Error: Not a number" :color error-color)))
+			  (lambda (&rest args)
+			    (declare (ignore args))
+			    (say "Error: Not a number" :color error-color)))
 	  :color color
 	  :error-color error-color))
 
