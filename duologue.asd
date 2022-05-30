@@ -14,7 +14,6 @@
 	       :alexandria
 	       :clavier 
 	       :chronicity
-	       :cl-readline
 	       :cl-ansi-text
 	       :drakma
 	       :cl-fad))
