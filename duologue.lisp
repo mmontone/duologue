@@ -101,7 +101,10 @@
 
   ``(choose \"Choose: \" (list \"foo\" \"bar\" \"baz\") :default \"baz\")``
 
-  Tags: menu, choose" 
+  Tags: menu, choose"
+  (assert (or (not default)
+	      (member default options :test 'string=))
+	  nil "Invalid default: ~s" default)
   (flet ((print-options ()
 	   (loop 
 	      for option in options
@@ -500,9 +503,11 @@
 
   Example: 
 
-  ``(choose-many \"Choose: \" (list \"foo\" \"bar\" \"baz\") :default \"baz\")``
+  ``(choose-many \"Choose: \" (list \"foo\" \"bar\" \"baz\") :default '(\"baz\"))``
 
-  Tags: menu, choose" 
+  Tags: menu, choose"
+  (assert (every (lambda (option) (member option options :test 'string=)) default)
+	  nil "Invalid default: ~s" default)
   (let ((chosen-options nil))
     (flet ((print-options ()
 	     (loop 
@@ -536,9 +541,9 @@
 	(loop 
 	   do 
 	     (cond ((equalp chosen-option "")
-		    (if default
-			(return default)
-			(return (reverse chosen-options))))
+		    (if chosen-options
+			(return (reverse chosen-options))
+			(return default)))
 		   ((find chosen-option (mapcar #'princ-to-string options) :test #'string=)
 		    (pushnew (find chosen-option (mapcar #'princ-to-string options) :test #'string=) chosen-options :test test)
 		    (when print-options
