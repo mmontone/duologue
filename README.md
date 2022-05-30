@@ -80,18 +80,6 @@ Example:
 **Tags**: menu, choose
 
 
-### make-list-completer
-
-```lisp
-(options)
-```
-
-Makes a default completer from a list of options
-
-
-
-
-
 ### prompt
 
 ```lisp
@@ -281,11 +269,3 @@ Example:
            (prompt "Item: "))
 ```
 **Tags**: flow
-
-
-## Generic-Functions
-## Slot-Accessors
-## Variables
-## Classs
-## Conditions
-## Constants

@@ -24,30 +24,6 @@
 	   (return-from find-option (car args))))
     nil))
 
-(defun make-list-completer (options)
-  "Makes a default completer from a list of options"
-  (lambda (text start end)
-    (declare (ignorable start end))
-    (labels ((common-prefix (items)
-             (subseq
-              (car items) 0
-              (position
-               nil
-               (mapcar
-                (lambda (i)
-                  (every (lambda (x)
-                           (char= (char (car items) i)
-                                  (char x           i)))
-                         (cdr items)))
-                (alexandria:iota (reduce #'min (mapcar #'length items)))))))
-           (select-completions (list)
-             (let ((els (remove-if-not (alexandria:curry #'alexandria:starts-with-subseq text)
-                                       list)))
-               (if (cdr els)
-                   (cons (common-prefix els) els)
-                   els))))
-      (select-completions options))))
-  
 (defun say (datum &rest args)
   "Prints a message on the screen.
 
@@ -92,7 +68,7 @@
          - default: The default value. The default value is selected if the user just hits the ENTER key. Default: nil.
          - print-options(boolean): Print the options on the screen. Default: T.
          - separator(string): Separation string to use when printing the options. Default: '~%'
-         - complete: If T, then readline completion is enabled. Default: nil.
+         - complete: If T, then completion is enabled. Default: nil.
          - completer: A custom completer. If NIL, then the default completer is used.
          - color: Color to use at prompt. Default: *prompt-color*
          - error-color: Color to use when error ocurrs. Default: *prompt-error-color*
@@ -122,8 +98,7 @@
 				  (cl-ansi-text:with-color (color :stream s)
 				    (format s "~A~@[[~A]~]" msg default)))
 				(format nil "~A~@[[~A]~]" msg default))))
-		 (rl:register-function :complete (or completer (make-list-completer options)))
-		 (string-trim (list #\ ) (rl:readline :prompt prompt))))
+		(complete-prompt prompt options completer)))
 	     (t
 	      (say msg :color color)
 	      (when default
@@ -220,8 +195,7 @@
 				  (cl-ansi-text:with-color (color :stream s)
 				    (format s "~A~@[[~A]~]" msg default)))
 				(format nil "~A~@[[~A]~]" msg default))))
-		(rl:register-function :complete completer)
-		(string-trim (list #\ ) (rl:readline :prompt prompt))))
+		(complete-prompt prompt nil completer)))
 	     ((not completer)
 	      (when msg
 		(say msg :color color))
@@ -382,7 +356,7 @@
          - if-invalid(function): Function to execute if the validator fails.
          - color: Prompt color
          - error-color: Prompt error color.
-         - complete: If T, then uses readline path completion. Default: T.
+         - complete: If T, then uses path completion. Default: T.
          - probe. If T, checks that the file exists on the filesystem.
          - if-exists: Function to call if the probe is successful.
          - if-does-not-exist(keyword): One of:
@@ -409,7 +383,7 @@
 				    (cl-ansi-text:with-color (color :stream s)
 				      (format s "~@[~A~]~@[[~A]~]" msg default)))
 				  (format nil "~@[~A~]~@[[~A]~]" msg default))))
-		  (rl:readline :prompt prompt)))
+		  (complete-prompt prompt nil nil)))
 	       ((not complete)
 		(when msg
 		  (say msg :color color))
@@ -496,7 +470,7 @@
          - default: The default value. The default value is selected if the user just hits the ENTER key. Default: nil.
          - print-options(boolean): Print the options on the screen. Default: T.
          - separator(string): Separation string to use when printing the options. Default: '~%'
-         - complete: If T, then readline completion is enabled. Default: nil.
+         - complete: If T, then completion is enabled. Default: nil.
          - completer: A custom completer. If NIL, then the default completer is used.
          - color: Color to use at prompt. Default: *prompt-color*
          - error-color: Color to use when error ocurrs. Default: *prompt-error-color*
@@ -527,8 +501,7 @@
 				    (cl-ansi-text:with-color (color :stream s)
 				      (format s "~A~@[[~A]~]" msg default)))
 				  (format nil "~A~@[[~A]~]" msg default))))
-		  (rl:register-function :complete (or completer (make-list-completer options)))
-		  (string-trim (list #\ ) (rl:readline :prompt prompt))))
+		  (complete-prompt prompt options completer)))
 	       (t
 		(say msg :color color)
 		(when default
