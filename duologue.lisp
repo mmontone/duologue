@@ -242,7 +242,9 @@
    Returns: the entered number"
   (prompt msg 
 	  :parser #'parse-integer
-	  :validator (or validator (clavier:is-an-integer))
+	  :validator (or (and validator (clavier:&& (clavier:is-an-integer)
+						    validator))
+			 (clavier:is-an-integer))
 	  :default default
 	  :required-p required-p
 	  :if-invalid (or if-invalid 
