@@ -340,7 +340,7 @@
             (prompt msg :default default
                         :required-p required-p
                         :validator (clavier:valid-url)
-                        :if-invalid (or if-invalid
+                        :if-invalid (or (parse-if-invalid if-invalid)
                                         (lambda (&optional value)
                                           (say "Invalid url" :color error-color)))
                         :color color
@@ -431,7 +431,7 @@
                          (return nil))
                         ((not parsed-input)
                          (if if-invalid
-                             (funcall if-invalid)
+                             (funcall (parse-if-invalid if-invalid))
                              (say "Invalid value" :color error-color)))
                         (parsed-input
                          (return parsed-input)))))))
@@ -476,7 +476,7 @@
           :parser #'chronicity:parse
           :default default
           :required-p required-p
-          :if-invalid (or if-invalid
+          :if-invalid (or (parse-if-invalid if-invalid)
                           (lambda () (say "Error. Invalid timestamp"
                                           :color error-color)))
           :color color
