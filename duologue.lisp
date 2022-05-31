@@ -8,7 +8,7 @@
     ((typep thing 'clavier:validator)
      thing)
     ((functionp thing)
-     (clavier:fn thing nil))
+     (clavier:fn thing ""))
     (t
      (error "Invalid validator spec: ~s" thing))))
 
@@ -60,6 +60,15 @@
     (when (or newline
 	      (not (cl-ppcre:scan "[ \\t](\\e\\[\\d+(;\\d+)*m)?\\Z" datum)))
       (terpri))))
+
+(defun parse-if-invalid (spec &optional error-color)
+  (cond
+    ((null spec) spec)
+    ((stringp spec) (lambda (value)
+		      (declare (ignore value))
+		      (say spec :color error-color)))
+    ((functionp spec) spec)
+    (t (error "Invalid value for :if-invalid: ~s" spec))))
   
 (defun choose (msg options &key if-wrong-option 
 			     default
@@ -223,12 +232,12 @@
 		      (cond
 			((not parsed-input)
 			 (if if-invalid
-			     (funcall if-invalid)
+			     (funcall (parse-if-invalid if-invalid error-color))
 			     (say "Invalid value" :color error-color)))
 			((and validator
 			      (not (funcall validator parsed-input)))
 			 (if if-invalid
-			     (funcall if-invalid parsed-input)
+			     (funcall (parse-if-invalid if-invalid error-color) parsed-input)
 			     (say "The value is not valid" :color error-color)))
 			(t
 			 (return parsed-input))))))))))
@@ -256,7 +265,7 @@
 			 (clavier:is-an-integer))
 	  :default default
 	  :required-p required-p
-	  :if-invalid (or if-invalid 
+	  :if-invalid (or (parse-if-invalid if-invalid)
 			  (lambda (&rest args)
 			    (declare (ignore args))
 			    (say "Error: Not a number" :color error-color)))
@@ -286,8 +295,9 @@
 	      :validator (or (and validator (clavier:&& (clavier:valid-email)
 							(make-validator validator)))
 			     (clavier:valid-email))
-	      :if-invalid (or if-invalid
+	      :if-invalid (or (parse-if-invalid if-invalid)
 			      (lambda (&optional value)
+				(declare (ignore value))
 				(say "Invalid email" :color error-color)))
 	      :color color
 	      :error-color error-color))
