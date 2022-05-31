@@ -15,5 +15,4 @@
 	       :clavier 
 	       :chronicity
 	       :cl-ansi-text
-	       :drakma
 	       :cl-fad))

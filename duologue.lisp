@@ -347,7 +347,8 @@
                         :error-color error-color)))
       (when probe
         (multiple-value-bind (result status)
-            (ignore-errors (drakma:http-request url))
+            (ignore-errors (funcall probe url))
+	  (declare (ignore result))
           (if (member status (list 200 302))
               (when if-exists
                 (funcall if-exists))
