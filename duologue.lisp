@@ -227,6 +227,7 @@
 (defun prompt-integer (&optional msg &key default 
 				       (required-p t) 
 				       if-invalid
+				       validator
 				       (color *prompt-color*)
 				       (error-color *prompt-error-color*))
   "Prompts for an integer.
@@ -241,7 +242,7 @@
    Returns: the entered number"
   (prompt msg 
 	  :parser #'parse-integer
-	  :validator (clavier:is-an-integer)
+	  :validator (or validator (clavier:is-an-integer))
 	  :default default
 	  :required-p required-p
 	  :if-invalid (or if-invalid 
