@@ -107,9 +107,9 @@
              for option in options
              for i from 0
              do
-                (format t "[~A] ~A" i option)
+                (format *query-io* "[~A] ~A" i option)
                 (when (< (1+ i) (length options))
-                  (format t separator)))
+                  (format *query-io* separator)))
            (terpri))
          (read-option ()
            (cond
@@ -195,7 +195,7 @@
                                if-invalid
                                parser
                                completer
-			       type
+                               type
                                (color *prompt-color*)
                                (error-color *prompt-error-color*))
   "Prompt for a string.
@@ -244,10 +244,10 @@
                       (if if-invalid
                           (funcall (parse-if-invalid if-invalid error-color) parsed-input)
                           (say "The value is not valid" :color error-color)))
-		     ((and type (not (typep parsed-input type)))
-		      (if if-invalid
-			  (funcall (parse-if-invalid if-invalid error-color) parsed-input)
-			  (say "Value should be of type: ~a" type :color error-color)))			   
+                     ((and type (not (typep parsed-input type)))
+                      (if if-invalid
+                          (funcall (parse-if-invalid if-invalid error-color) parsed-input)
+                          (say "Value should be of type: ~a" type :color error-color)))
                      (t
                       (return parsed-input))))))))))
 
@@ -527,9 +527,9 @@
                for option in options
                for i from 0
                do
-                  (format t "[~A] ~A" i option)
+                  (format *query-io* "[~A] ~A" i option)
                   (when (< (1+ i) (length options))
-                    (format t separator)))
+                    (format *query-io* separator)))
              (terpri)
              (say "Chosen options: ~{~A~^, ~}" (reverse chosen-options)))
            (read-option ()
