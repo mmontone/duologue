@@ -3,6 +3,15 @@
 (defparameter *prompt-color* nil "The default prompt color.")
 (defparameter *prompt-error-color* nil "The default error color")
 
+(defun make-validator (thing)
+  (cond
+    ((typep thing 'clavier:validator)
+     thing)
+    ((functionp thing)
+     (clavier:fn thing nil))
+    (t
+     (error "Invalid validator spec: ~s" thing))))
+
 (defun remove-options (args &rest keys)
   (let ((args (copy-list args))
 	(new-args nil))
@@ -243,7 +252,7 @@
   (prompt msg 
 	  :parser #'parse-integer
 	  :validator (or (and validator (clavier:&& (clavier:is-an-integer)
-						    validator))
+						    (make-validator validator)))
 			 (clavier:is-an-integer))
 	  :default default
 	  :required-p required-p
@@ -255,7 +264,8 @@
 	  :error-color error-color))
 
 (defun prompt-email (&optional msg &key default 
-				     (required-p t) 
+				     (required-p t)
+				     validator
 				     if-invalid
 				     (color *prompt-color*)
 				     (error-color *prompt-error-color*))
@@ -272,13 +282,15 @@
 
    The email is validated and the process does not stop until the user enters a valid email address."
   (prompt msg :default default
-	  :required-p required-p
-	  :validator (clavier:valid-email)
-	  :if-invalid (or if-invalid
-			  (lambda (&optional value)
-			    (say "Invalid email" :color error-color)))
-	  :color color
-	  :error-color error-color))
+	      :required-p required-p
+	      :validator (or (and validator (clavier:&& (clavier:valid-email)
+							(make-validator validator)))
+			     (clavier:valid-email))
+	      :if-invalid (or if-invalid
+			      (lambda (&optional value)
+				(say "Invalid email" :color error-color)))
+	      :color color
+	      :error-color error-color))
 
 (defun prompt-url (&optional msg &key default 
 				   (required-p t) 
