@@ -195,6 +195,7 @@
                                if-invalid
                                parser
                                completer
+			       type
                                (color *prompt-color*)
                                (error-color *prompt-error-color*))
   "Prompt for a string.
@@ -206,6 +207,7 @@
          - if-invalid(function): Function to execute if the validator fails.
          - parser (function): A function to parse the input string.
          - completer: A custom completer. Default: no completion.
+         - type: Type expected.
          - color: Prompt color
          - error-color: Prompt error color."
   (flet ((read-input ()
@@ -242,6 +244,10 @@
                       (if if-invalid
                           (funcall (parse-if-invalid if-invalid error-color) parsed-input)
                           (say "The value is not valid" :color error-color)))
+		     ((and type (not (typep parsed-input type)))
+		      (if if-invalid
+			  (funcall (parse-if-invalid if-invalid error-color) parsed-input)
+			  (say "Value should be of type: ~a" type :color error-color)))			   
                      (t
                       (return parsed-input))))))))))
 
