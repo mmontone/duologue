@@ -229,8 +229,8 @@
                (return default))
               ((and (equalp input "") required-p)
                (say "A non empty value is required" :color error-color))
-              (t (let ((parsed-input (or (and parser
-                                              (ignore-errors (funcall parser input)))
+              (t (let ((parsed-input (if parser
+                                         (ignore-errors (funcall parser input))
                                          input)))
                    (cond
                      ((not parsed-input)
