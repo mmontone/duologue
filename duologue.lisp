@@ -33,6 +33,9 @@
                (return-from find-option (car args))))
     nil))
 
+(defun duologue-read-line ()
+  (read-line *query-io*))
+
 (defun say (datum &rest args)
   "Prints a message on the screen.
 
@@ -121,7 +124,7 @@
               (say msg :color color)
               (when default
                 (say "[~A] " default :color color))
-              (string-trim (list #\ ) (read-line))))))
+              (string-trim (list #\ ) (duologue-read-line))))))
     (when print-options
       (print-options))
     (let* ((chosen-option (read-option))
@@ -168,7 +171,7 @@
              (say msg :color color)
              (when default-p
                (say "[~A] " (format-boolean default) :color color))
-             (string-trim (list #\ ) (read-line))))
+             (string-trim (list #\ ) (duologue-read-line))))
     (let ((answer (ask-question)))
       (loop
         do
@@ -219,7 +222,7 @@
                 (say msg :color color))
               (when default
                 (say "[~A] " default :color color))
-              (string-trim (list #\ ) (read-line))))))
+              (string-trim (list #\ ) (duologue-read-line))))))
     (loop do
       (let ((input (read-input)))
         (cond ((and (equalp input "") default)
@@ -348,7 +351,7 @@
       (when probe
         (multiple-value-bind (result status)
             (ignore-errors (funcall probe url))
-	  (declare (ignore result))
+          (declare (ignore result))
           (if (member status (list 200 302))
               (when if-exists
                 (funcall if-exists))
@@ -419,7 +422,7 @@
                   (say msg :color color))
                 (when default
                   (say "[~A] " default :color color))
-                (read-line)))))
+                (duologue-read-line)))))
       (let ((pathname
               (loop do
                 (let* ((input (read-input))
@@ -479,7 +482,7 @@
           :required-p required-p
           :if-invalid (or (parse-if-invalid if-invalid error-color)
                           (lambda () (say "Error. Invalid timestamp"
-                                          :color error-color)))
+                                     :color error-color)))
           :color color
           :error-color error-color))
 
@@ -536,7 +539,7 @@
                 (say msg :color color)
                 (when default
                   (say "[~A] " default :color color))
-                (string-trim (list #\ ) (read-line))))))
+                (string-trim (list #\ ) (duologue-read-line))))))
       (when print-options
         (print-options))
       (let* ((chosen-option (read-option))
