@@ -265,7 +265,7 @@
                          (clavier:is-an-integer))
           :default default
           :required-p required-p
-          :if-invalid (or (parse-if-invalid if-invalid)
+          :if-invalid (or (parse-if-invalid if-invalid error-color)
                           (lambda (&rest args)
                             (declare (ignore args))
                             (say "Error: Not a number" :color error-color)))
@@ -295,7 +295,7 @@
               :validator (or (and validator (clavier:&& (clavier:valid-email)
                                                         (make-validator validator)))
                              (clavier:valid-email))
-              :if-invalid (or (parse-if-invalid if-invalid)
+              :if-invalid (or (parse-if-invalid if-invalid error-color)
                               (lambda (&optional value)
                                 (declare (ignore value))
                                 (say "Invalid email" :color error-color)))
@@ -340,7 +340,7 @@
             (prompt msg :default default
                         :required-p required-p
                         :validator (clavier:valid-url)
-                        :if-invalid (or (parse-if-invalid if-invalid)
+                        :if-invalid (or (parse-if-invalid if-invalid error-color)
                                         (lambda (&optional value)
                                           (say "Invalid url" :color error-color)))
                         :color color
@@ -431,7 +431,7 @@
                          (return nil))
                         ((not parsed-input)
                          (if if-invalid
-                             (funcall (parse-if-invalid if-invalid))
+                             (funcall (parse-if-invalid if-invalid error-color))
                              (say "Invalid value" :color error-color)))
                         (parsed-input
                          (return parsed-input)))))))
@@ -476,7 +476,7 @@
           :parser #'chronicity:parse
           :default default
           :required-p required-p
-          :if-invalid (or (parse-if-invalid if-invalid)
+          :if-invalid (or (parse-if-invalid if-invalid error-color)
                           (lambda () (say "Error. Invalid timestamp"
                                           :color error-color)))
           :color color
