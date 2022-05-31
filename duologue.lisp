@@ -237,7 +237,7 @@
                    (cond
                      ((not parsed-input)
                       (if if-invalid
-                          (funcall (parse-if-invalid if-invalid error-color))
+                          (funcall (parse-if-invalid if-invalid error-color) input)
                           (say "Invalid value" :color error-color)))
                      ((and validator
                            (not (funcall validator parsed-input)))
