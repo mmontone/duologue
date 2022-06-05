@@ -152,11 +152,11 @@
            (setf chosen-option (read-option))
            (setf option-number (ignore-errors (parse-integer chosen-option)))))))
 
-(defun ask (&optional (msg "Yes or no: ") &key
-                                            (default nil default-p)
-                                            if-wrong-answer
-                                            (color *prompt-color*)
-                                            (error-color *prompt-error-color*))
+(defun ask (msg &key
+                  (default nil default-p)
+                  if-wrong-answer
+                  (color *prompt-color*)
+                  (error-color *prompt-error-color*))
   "Ask for yes or no.
 
    Args: - msg(string): The prompt to use. Default: 'Yes or no: '.
@@ -188,16 +188,16 @@
                   (say "Answer yes or no" :color error-color))
               (setf answer (ask-question))))))))
 
-(defun prompt (&optional msg &key
-                               default
-                               (required-p t)
-                               validator
-                               if-invalid
-                               parser
-                               completer
-                               type
-                               (color *prompt-color*)
-                               (error-color *prompt-error-color*))
+(defun prompt (msg &key
+                     default
+                     (required-p t)
+                     validator
+                     if-invalid
+                     parser
+                     completer
+                     type
+                     (color *prompt-color*)
+                     (error-color *prompt-error-color*))
   "Prompt for a string.
 
    Args: - msg: The prompt.
@@ -251,12 +251,12 @@
                      (t
                       (return parsed-input))))))))))
 
-(defun prompt-integer (&optional msg &key default
-                                       (required-p t)
-                                       if-invalid
-                                       validator
-                                       (color *prompt-color*)
-                                       (error-color *prompt-error-color*))
+(defun prompt-integer (msg &key default
+                             (required-p t)
+                             if-invalid
+                             validator
+                             (color *prompt-color*)
+                             (error-color *prompt-error-color*))
   "Prompts for an integer.
 
    Args: - msg: The prompt.
@@ -281,12 +281,12 @@
           :color color
           :error-color error-color))
 
-(defun prompt-email (&optional msg &key default
-                                     (required-p t)
-                                     validator
-                                     if-invalid
-                                     (color *prompt-color*)
-                                     (error-color *prompt-error-color*))
+(defun prompt-email (msg &key default
+                           (required-p t)
+                           validator
+                           if-invalid
+                           (color *prompt-color*)
+                           (error-color *prompt-error-color*))
   "Prompts for an email.
 
    Args: - msg: The prompt.
@@ -311,14 +311,14 @@
               :color color
               :error-color error-color))
 
-(defun prompt-url (&optional msg &key default
-                                   (required-p t)
-                                   if-invalid
-                                   (color *prompt-color*)
-                                   (error-color *prompt-error-color*)
-                                   probe
-                                   if-exists
-                                   (if-does-not-exist :error))
+(defun prompt-url (msg &key default
+                         (required-p t)
+                         if-invalid
+                         (color *prompt-color*)
+                         (error-color *prompt-error-color*)
+                         probe
+                         if-exists
+                         (if-does-not-exist :error))
   "Prompts for an url.
 
    Args: - msg: The prompt.
@@ -351,6 +351,7 @@
                         :validator (clavier:valid-url)
                         :if-invalid (or (parse-if-invalid if-invalid error-color)
                                         (lambda (&optional value)
+					  (declare (ignore value))
                                           (say "Invalid url" :color error-color)))
                         :color color
                         :error-color error-color)))
@@ -374,18 +375,17 @@
                  (say "The url does not exist." :color error-color))))))
       url)))
 
-(defun prompt-pathname (&optional msg &key default
-                                        (required-p t)
-                                        if-invalid
-                                        (color *prompt-color*)
-                                        (error-color *prompt-error-color*)
-                                        probe
-                                        if-exists
-                                        (if-does-not-exist :error)
-                                        absolute-p
-                                        file-type
-                                        directory-p
-                                        (complete t))
+(defun prompt-pathname (msg &key default
+                              (required-p t)
+                              if-invalid
+                              (color *prompt-color*)
+                              (error-color *prompt-error-color*)
+                              probe
+                              if-exists
+                              (if-does-not-exist :error)
+                              absolute-p
+                              file-type
+                              (complete t))
   "Prompts for a pathname.
 
    Args: - msg: The prompt.
@@ -463,11 +463,11 @@
                 )))
         pathname))))
 
-(defun prompt-datetime (&optional msg &key default
-                                        (required-p t)
-                                        if-invalid
-                                        (color *prompt-color*)
-                                        (error-color *prompt-error-color*))
+(defun prompt-datetime (msg &key default
+                              (required-p t)
+                              if-invalid
+                              (color *prompt-color*)
+                              (error-color *prompt-error-color*))
   "Prompts for a timestamp.
 
    Args: - msg: The prompt.
