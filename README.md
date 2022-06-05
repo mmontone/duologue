@@ -6,13 +6,13 @@ Duologue is high-level interaction library for Common Lisp. Command line interac
 ### ask
 
 ```lisp
-(&optional (msg "Yes or no: ") &key (default nil default-p) if-wrong-answer
+(msg &key (default nil default-p) if-wrong-answer
  (color *prompt-color*) (error-color *prompt-error-color*))
 ```
 
 Ask for yes or no.
 
-- **msg**: (string) The prompt to use. Default: 'Yes or no: '.
+- **msg**: (string) The prompt to use.
 - **default**: Default value. It gets selected if the user enters the empty string. Default: nil.
 - **if-wrong-answer**: (function) Function to execute if a wrong answer is given.
 - **color**: Prompt color.
@@ -83,7 +83,7 @@ Example:
 ### prompt
 
 ```lisp
-(&optional msg &key (default nil default-p) (required-p t) validator if-invalid
+(msg &key (default nil default-p) (required-p t) validator if-invalid
  parser completer (color *prompt-color*) (error-color *prompt-error-color*))
 ```
 
@@ -105,7 +105,7 @@ Prompt for a string.
 ### prompt-datetime
 
 ```lisp
-(&optional msg &key default (required-p t) if-invalid (color *prompt-color*)
+(msg &key default (required-p t) if-invalid (color *prompt-color*)
  (error-color *prompt-error-color*))
 ```
 
@@ -127,7 +127,7 @@ The input is parsed with chronicity library and transformed to a local-time.
 ### prompt-email
 
 ```lisp
-(&optional msg &key default (required-p t) if-invalid (color *prompt-color*)
+(msg &key default (required-p t) if-invalid (color *prompt-color*)
  (error-color *prompt-error-color*))
 ```
 
@@ -148,7 +148,7 @@ The email is validated and the process does not stop until the user enters a val
 ### prompt-integer
 
 ```lisp
-(&optional msg &key default (required-p t) if-invalid (color *prompt-color*)
+(msg &key default (required-p t) if-invalid (color *prompt-color*)
  (error-color *prompt-error-color*))
 ```
 
@@ -169,7 +169,7 @@ Prompts for an integer.
 ### prompt-pathname
 
 ```lisp
-(&optional msg &key default (required-p t) if-invalid (color *prompt-color*)
+(msg &key default (required-p t) if-invalid (color *prompt-color*)
  (error-color *prompt-error-color*) probe if-exists (if-does-not-exist :error)
  absolute-p file-type directory-p (complete t))
 ```
@@ -197,7 +197,7 @@ Prompts for a pathname.
 ### prompt-url
 
 ```lisp
-(&optional msg &key default (required-p t) if-invalid (color *prompt-color*)
+(msg &key default (required-p t) if-invalid (color *prompt-color*)
  (error-color *prompt-error-color*) probe if-exists (if-does-not-exist :error))
 ```
 
