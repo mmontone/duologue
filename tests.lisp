@@ -1,7 +1,13 @@
 (defpackage :duologue/tests
-  (:use :cl :stefil :duologue))
+  (:use :cl :stefil :duologue)
+  (:export :run-tests))
 
 (in-package :duologue/tests)
+
+(defsuite* duologue-tests)
+
+(defun run-tests ()
+  (duologue-tests))
 
 (deftest prompt-test ()
   (with-input-from-string (*query-io* "something

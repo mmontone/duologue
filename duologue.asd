@@ -15,4 +15,5 @@
 	       :clavier 
 	       :chronicity
 	       :cl-ansi-text
-	       :cl-fad))
+	       :cl-fad)
+  :in-order-to ((asdf:test-op (asdf:test-op :duologue-test))))
